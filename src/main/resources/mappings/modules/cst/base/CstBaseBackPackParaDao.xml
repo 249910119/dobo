@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.base.CstBaseBackPackParaDao">
+    
+	<sql id="cstBaseBackPackParaColumns">
+		a.detail_id AS "detailId",
+		a.mfr_name AS "mfrName",
+		a.equip_type_name AS "equipTypeName",
+		a.resource_desc AS "resourceDesc",
+		a.cooper_code AS "cooperCode",
+		a.package_name AS "packageName",
+		a.supplier_name AS "supplierName",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstBaseBackPackParaJoins">
+	</sql>
+    
+	<select id="get" resultType="CstBaseBackPackPara">
+		SELECT 
+			<include refid="cstBaseBackPackParaColumns"/>
+		FROM cst_base_back_pack_para a
+		<include refid="cstBaseBackPackParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstBaseBackPackPara">
+		SELECT 
+			<include refid="cstBaseBackPackParaColumns"/>
+		FROM cst_base_back_pack_para a
+		<include refid="cstBaseBackPackParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstBaseBackPackPara">
+		SELECT 
+			<include refid="cstBaseBackPackParaColumns"/>
+		FROM cst_base_back_pack_para a
+		<include refid="cstBaseBackPackParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_base_back_pack_para(
+			detail_id,
+			mfr_name,
+			equip_type_name,
+			resource_desc,
+			cooper_code,
+			package_name,
+			supplier_name,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{detailId},
+			#{mfrName},
+			#{equipTypeName},
+			#{resourceDesc},
+			#{cooperCode},
+			#{packageName},
+			#{supplierName},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_base_back_pack_para SET 	
+			detail_id = #{detailId},
+			mfr_name = #{mfrName},
+			equip_type_name = #{equipTypeName},
+			resource_desc = #{resourceDesc},
+			cooper_code = #{cooperCode},
+			package_name = #{packageName},
+			supplier_name = #{supplierName},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_base_back_pack_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

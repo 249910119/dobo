@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cop.dao.detail.CopSalesUseDetailDao">
+    
+	<sql id="copSalesUseDetailColumns">
+		a.id AS "id",
+		a.case_confirm_id AS "caseConfirmId",
+		a.sales_account_id AS "salesAccountId",
+		a.account_id AS "accountId",
+		a.dc_prj_id AS "dcPrjId",
+		a.order_id AS "orderId",
+		a.price_type AS "priceType",
+		a.use_amount AS "useAmount",
+		a.use_desc AS "useDesc",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.cost_scale AS "costScale"
+	</sql>
+	
+	<sql id="copSalesUseDetailJoins">
+	</sql>
+	
+	<sql id="caseAccountUsedColumns">
+		a.id AS "id",
+		a.case_confirm_id AS "caseConfirmId",
+		a.sales_account_id AS "salesAccountId",
+		a.account_id AS "accountId",
+		a.dc_prj_id AS "dcPrjId",
+		a.order_id AS "orderId",
+		a.price_type AS "priceType",
+		a.use_amount AS "useAmount",
+		a.cost_scale AS "costScale",
+		b.once_num AS "onceNum"
+	</sql>
+	
+	<select id="getCaseAccountUsedList" resultType="CopSalesUseDetail">
+		SELECT 
+			<include refid="caseAccountUsedColumns"/>
+		FROM cop_sales_use_detail a,cop_case_price_confirm b
+		<where>
+			<![CDATA[ 
+				a.case_confirm_id = b.id 
+				AND b.status = 'A2' AND a.status = 'A0' 
+				AND TO_CHAR(b.create_date, 'yyyyMMdd') <= #{createDateStr}
+			]]>
+			<if test="dcPrjId != null and dcPrjId != ''">
+				AND b.dc_prj_id = #{dcPrjId}
+			</if>
+		</where>
+			ORDER BY a.case_confirm_id DESC
+	</select>
+	
+	<select id="getSameCaseAccountUsedList" resultType="CopSalesUseDetail">
+		SELECT 
+			<include refid="caseAccountUsedColumns"/>
+		FROM cop_sales_use_detail a,cop_case_price_confirm b
+		<where>
+			<![CDATA[ 
+				a.case_confirm_id = b.id 
+				AND b.status = 'A2' AND a.status = 'A0' 
+				AND a.case_confirm_id in (
+					select m.case_confirm_id from cop_sales_use_detail m 
+					group by m.case_confirm_id 
+					having count(m.case_confirm_id) > 1 ) 
+				AND TO_CHAR(b.create_date, 'yyyyMMdd') <= #{createDateStr}
+			]]>
+			<if test="dcPrjId != null and dcPrjId != ''">
+				AND b.dc_prj_id = #{dcPrjId}
+			</if>
+		</where>
+			ORDER BY a.case_confirm_id DESC
+	</select>
+    
+    
+	<select id="get" resultType="CopSalesUseDetail">
+		SELECT 
+			<include refid="copSalesUseDetailColumns"/>
+		FROM cop_sales_use_detail a
+		<include refid="copSalesUseDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CopSalesUseDetail">
+		SELECT 
+			<include refid="copSalesUseDetailColumns"/>
+		FROM cop_sales_use_detail a
+		<include refid="copSalesUseDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CopSalesUseDetail">
+		SELECT 
+			<include refid="copSalesUseDetailColumns"/>
+		FROM cop_sales_use_detail a
+		<include refid="copSalesUseDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cop_sales_use_detail(
+			id,
+			case_confirm_id,
+			sales_account_id,
+			account_id,
+			dc_prj_id,
+			order_id,
+			price_type,
+			use_amount,
+			use_desc,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag,
+			cost_scale
+		) VALUES (
+			#{id},
+			#{caseConfirmId},
+			#{salesAccountId},
+			#{accountId},
+			#{dcPrjId},
+			#{orderId},
+			#{priceType},
+			#{useAmount},
+			#{useDesc},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{costScale}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cop_sales_use_detail SET 	
+			case_confirm_id = #{caseConfirmId},
+			sales_account_id = #{salesAccountId},
+			account_id = #{accountId},
+			dc_prj_id = #{dcPrjId},
+			order_id = #{orderId},
+			price_type = #{priceType},
+			use_amount = #{useAmount},
+			use_desc = #{useDesc},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag},
+			cost_scale = #{costScale}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cop_sales_use_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.soft.CstSoftPackDegreeParaDao">
+    
+	<sql id="cstSoftPackDegreeParaColumns">
+		a.id AS "id",
+		a.rule_id AS "ruleId",
+		a.rule_desc AS "ruleDesc",
+		a.line1_level2_scale AS "line1Level2Scale",
+		a.line1_level3_scale AS "line1Level3Scale",
+		a.line1_level4_scale AS "line1Level4Scale",
+		a.pm_level3_scale AS "pmLevel3Scale",
+		a.pm_level4_scale AS "pmLevel4Scale",
+		a.pm_level5_scale AS "pmLevel5Scale",
+		a.sla_a_scale AS "slaAScale",
+		a.sla_b_scale AS "slaBScale",
+		a.sla_c_scale AS "slaCScale",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstSoftPackDegreeParaJoins">
+	</sql>
+    
+	<select id="get" resultType="CstSoftPackDegreePara">
+		SELECT 
+			<include refid="cstSoftPackDegreeParaColumns"/>
+		FROM cst_soft_pack_degree_para a
+		<include refid="cstSoftPackDegreeParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstSoftPackDegreePara">
+		SELECT 
+			<include refid="cstSoftPackDegreeParaColumns"/>
+		FROM cst_soft_pack_degree_para a
+		<include refid="cstSoftPackDegreeParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstSoftPackDegreePara">
+		SELECT 
+			<include refid="cstSoftPackDegreeParaColumns"/>
+		FROM cst_soft_pack_degree_para a
+		<include refid="cstSoftPackDegreeParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_soft_pack_degree_para(
+			id,
+			rule_id,
+			rule_desc,
+			line1_level2_scale,
+			line1_level3_scale,
+			line1_level4_scale,
+			pm_level3_scale,
+			pm_level4_scale,
+			pm_level5_scale,
+			sla_a_scale,
+			sla_b_scale,
+			sla_c_scale,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{ruleId},
+			#{ruleDesc},
+			#{line1Level2Scale},
+			#{line1Level3Scale},
+			#{line1Level4Scale},
+			#{pmLevel3Scale},
+			#{pmLevel4Scale},
+			#{pmLevel5Scale},
+			#{slaAScale},
+			#{slaBScale},
+			#{slaCScale},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_soft_pack_degree_para SET 	
+			rule_id = #{ruleId},
+			rule_desc = #{ruleDesc},
+			line1_level2_scale = #{line1Level2Scale},
+			line1_level3_scale = #{line1Level3Scale},
+			line1_level4_scale = #{line1Level4Scale},
+			pm_level3_scale = #{pmLevel3Scale},
+			pm_level4_scale = #{pmLevel4Scale},
+			pm_level5_scale = #{pmLevel5Scale},
+			sla_a_scale = #{slaAScale},
+			sla_b_scale = #{slaBScale},
+			sla_c_scale = #{slaCScale},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_soft_pack_degree_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

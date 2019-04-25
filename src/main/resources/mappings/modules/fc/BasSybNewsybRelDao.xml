@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.BasSybNewsybRelDao">
+	
+	<select id="findListByFiscalYear" resultType="BasSybNewsybRel">
+		SELECT 
+			<include refid="basSybNewsybRelColumns"/>
+		FROM bi.bas_syb_newsyb_rel a
+		<where>
+			a.fiscal_year = #{fiscalYear}
+		</where>
+	</select>
+    
+	<sql id="basSybNewsybRelColumns">
+		a.rel_id AS "relId",
+		a.sybmc AS "sybmc",
+		a.new_sybmc AS "newSybmc",
+		a.fiscal_year AS "fiscalYear",
+		a.create_date AS "createDate",
+		a.remark AS "remark"
+	</sql>
+	
+	<sql id="basSybNewsybRelJoins">
+	</sql>
+    
+	<select id="get" resultType="BasSybNewsybRel">
+		SELECT 
+			<include refid="basSybNewsybRelColumns"/>
+		FROM bi.bas_syb_newsyb_rel a
+		<include refid="basSybNewsybRelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BasSybNewsybRel">
+		SELECT 
+			<include refid="basSybNewsybRelColumns"/>
+		FROM bi.bas_syb_newsyb_rel a
+		<include refid="basSybNewsybRelJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BasSybNewsybRel">
+		SELECT 
+			<include refid="basSybNewsybRelColumns"/>
+		FROM bi.bas_syb_newsyb_rel a
+		<include refid="basSybNewsybRelJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bi.bas_syb_newsyb_rel(
+			rel_id,
+			sybmc,
+			new_sybmc,
+			fiscal_year,
+			create_date,
+			remark
+		) VALUES (
+			#{relId},
+			#{sybmc},
+			#{newSybmc},
+			#{fiscalYear},
+			#{createDate},
+			#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bi.bas_syb_newsyb_rel SET 	
+			rel_id = #{relId},
+			sybmc = #{sybmc},
+			new_sybmc = #{newSybmc},
+			fiscal_year = #{fiscalYear},
+			remark = #{remark}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bi.bas_syb_newsyb_rel
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

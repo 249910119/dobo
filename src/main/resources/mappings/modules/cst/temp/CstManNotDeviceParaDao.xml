@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.temp.CstManNotDeviceParaDao">
+    
+	<sql id="cstManNotDeviceParaColumns">
+		a.id AS "id",
+		a.prod_detail AS "prodDetail",
+		a.prod_service_id AS "prodServiceId",
+		a.prod_service_name AS "prodServiceName",
+		a.line1_level2_scale AS "line1Level2Scale",
+		a.line1_level3_scale AS "line1Level3Scale",
+		a.line1_level4_scale AS "line1Level4Scale",
+		a.standard_amount AS "standardAmount",
+		a.prod_degree AS "prodDegree",
+		a.line2_level4_hour_scale AS "line2Level4HourScale",
+		a.line2_level5_hour_scale AS "line2Level5HourScale",
+		a.line2_level6_hour_scale AS "line2Level6HourScale",
+		a.cmo_hour_scale AS "cmoHourScale",
+		a.pm_level3_hour_scale AS "pmLevel3HourScale",
+		a.pm_level4_hour_scale AS "pmLevel4HourScale",
+		a.pm_level5_hour_scale AS "pmLevel5HourScale",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstManNotDeviceParaJoins">
+	</sql>
+    
+	<select id="get" resultType="CstManNotDevicePara">
+		SELECT 
+			<include refid="cstManNotDeviceParaColumns"/>
+		FROM cst_man_not_device_para a
+		<include refid="cstManNotDeviceParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstManNotDevicePara">
+		SELECT 
+			<include refid="cstManNotDeviceParaColumns"/>
+		FROM cst_man_not_device_para a
+		<include refid="cstManNotDeviceParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstManNotDevicePara">
+		SELECT 
+			<include refid="cstManNotDeviceParaColumns"/>
+		FROM cst_man_not_device_para a
+		<include refid="cstManNotDeviceParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_man_not_device_para(
+			id,
+			prod_detail,
+			prod_service_id,
+			prod_service_name,
+			line1_level2_scale,
+			line1_level3_scale,
+			line1_level4_scale,
+			standard_amount,
+			prod_degree,
+			line2_level4_hour_scale,
+			line2_level5_hour_scale,
+			line2_level6_hour_scale,
+			cmo_hour_scale,
+			pm_level3_hour_scale,
+			pm_level4_hour_scale,
+			pm_level5_hour_scale,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{prodDetail},
+			#{prodServiceId},
+			#{prodServiceName},
+			#{line1Level2Scale},
+			#{line1Level3Scale},
+			#{line1Level4Scale},
+			#{standardAmount},
+			#{prodDegree},
+			#{line2Level4HourScale},
+			#{line2Level5HourScale},
+			#{line2Level6HourScale},
+			#{cmoHourScale},
+			#{pmLevel3HourScale},
+			#{pmLevel4HourScale},
+			#{pmLevel5HourScale},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_man_not_device_para SET 	
+			prod_detail = #{prodDetail},
+			prod_service_id = #{prodServiceId},
+			prod_service_name = #{prodServiceName},
+			line1_level2_scale = #{line1Level2Scale},
+			line1_level3_scale = #{line1Level3Scale},
+			line1_level4_scale = #{line1Level4Scale},
+			standard_amount = #{standardAmount},
+			prod_degree = #{prodDegree},
+			line2_level4_hour_scale = #{line2Level4HourScale},
+			line2_level5_hour_scale = #{line2Level5HourScale},
+			line2_level6_hour_scale = #{line2Level6HourScale},
+			cmo_hour_scale = #{cmoHourScale},
+			pm_level3_hour_scale = #{pmLevel3HourScale},
+			pm_level4_hour_scale = #{pmLevel4HourScale},
+			pm_level5_hour_scale = #{pmLevel5HourScale},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_man_not_device_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

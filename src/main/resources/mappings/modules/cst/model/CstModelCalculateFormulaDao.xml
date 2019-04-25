@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.model.CstModelCalculateFormulaDao">
+    
+	<sql id="cstModelCalculateFormulaColumns">
+		a.id AS "id",
+		a.module_id AS "moduleId",
+		a.is_model_para AS "isModelPara",
+		a.cost_type AS "costType",
+		a.return_type AS "returnType",
+		a.measure_id AS "measureId",
+		a.formula_name AS "formulaName",
+		a.formula_desc AS "formulaDesc",
+		a.formula AS "formula",
+		a.display_order AS "displayOrder",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.pre_status AS "preStatus",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a1.id AS "cstModelModuleInfo.id",
+		a1.module_name AS "cstModelModuleInfo.moduleName",
+		a2.measure_Id AS "measuredef.measureId",
+		a2.measure_name AS "measuredef.measureName",
+		a3.cost_Type AS "ctType.costType",
+		a3.type_Name AS "ctType.typeName"
+	</sql>
+	
+	<sql id="cstModelCalculateFormulaJoins">
+		LEFT JOIN cst_model_module_info a1 ON a1.id = a.module_id
+		LEFT JOIN prod.t_rul_measuredef a2 ON a2.measure_Id = a.measure_Id
+		LEFT JOIN prod.t_rul_costtype a3 ON a3.cost_Type = a.cost_Type
+	</sql>
+    
+	<select id="get" resultType="CstModelCalculateFormula">
+		SELECT 
+			<include refid="cstModelCalculateFormulaColumns"/>
+		FROM cst_model_calculate_formula a
+		<include refid="cstModelCalculateFormulaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstModelCalculateFormula">
+		SELECT 
+			<include refid="cstModelCalculateFormulaColumns"/>
+		FROM cst_model_calculate_formula a
+		<include refid="cstModelCalculateFormulaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="moduleId != null and moduleId != ''">
+				AND a.module_id = #{moduleId}
+			</if>
+			<if test="isModelPara != null and isModelPara != ''">
+				AND a.is_model_para = #{isModelPara}
+			</if>
+			<if test="formulaName != null and formulaName != ''">
+				AND a.formula_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{formulaName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{formulaName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{formulaName},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstModelCalculateFormula">
+		SELECT 
+			<include refid="cstModelCalculateFormulaColumns"/>
+		FROM cst_model_calculate_formula a
+		<include refid="cstModelCalculateFormulaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} and a.status = 'A0'
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.module_id,a.display_order 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_model_calculate_formula(
+			id,
+			module_id,
+			is_model_para,
+			cost_type,
+			return_type,
+			measure_id,
+			formula_name,
+			formula_desc,
+			formula,
+			display_order,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			pre_status,
+			remarks,
+			del_flag,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{moduleId},
+			#{isModelPara},
+			#{costType},
+			#{returnType},
+			#{measureId},
+			#{formulaName},
+			#{formulaDesc},
+			#{formula},
+			#{displayOrder},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{preStatus},
+			#{remarks},
+			#{delFlag},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_model_calculate_formula SET 	
+			module_id = #{moduleId},
+			is_model_para = #{isModelPara},
+			cost_type = #{costType},
+			return_type = #{returnType},
+			measure_id = #{measureId},
+			formula_name = #{formulaName},
+			formula_desc = #{formulaDesc},
+			formula = #{formula},
+			display_order = #{displayOrder},
+			status = #{status},
+			remarks = #{remarks},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_model_calculate_formula SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

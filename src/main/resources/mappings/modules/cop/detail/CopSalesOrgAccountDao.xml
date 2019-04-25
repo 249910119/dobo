@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cop.dao.detail.CopSalesOrgAccountDao">
+    
+	<sql id="copSalesOrgAccountColumns">
+		a.id AS "id",
+		a.account_id AS "accountId",
+		a.org_id AS "orgId",
+		a.org_name AS "orgName",
+		a.bu_name AS "buName",
+		a.sign_amount AS "signAmount",
+		a.case_max_amount AS "caseMaxAmount",
+		a.case_used_amount AS "caseUsedAmount",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="copSalesOrgAccountJoins">
+	</sql>
+    
+	<select id="get" resultType="CopSalesOrgAccount">
+		SELECT 
+			<include refid="copSalesOrgAccountColumns"/>
+		FROM cop_sales_org_account a
+		<include refid="copSalesOrgAccountJoins"/>
+		WHERE a.id = #{id}
+		
+	</select>
+	
+	<select id="findList" resultType="CopSalesOrgAccount">
+		SELECT 
+			<include refid="copSalesOrgAccountColumns"/>
+		FROM cop_sales_org_account a
+		<include refid="copSalesOrgAccountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="orgId != null and orgId != ''">
+				AND a.org_id = #{orgId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CopSalesOrgAccount">
+		SELECT 
+			<include refid="copSalesOrgAccountColumns"/>
+		FROM cop_sales_org_account a
+		<include refid="copSalesOrgAccountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+		<!-- t.valid_flag = 'A0' AND -->
+	<select id="getSalesByCase" resultType="java.util.HashMap" parameterType="java.lang.String">
+		SELECT t.staff_id,t.org_id FROM pub.t_sys_staff t 
+		WHERE 
+		   t.staff_id = #{staffId}
+	</select>
+	
+	<select id="getSalesOrgCaseUsedAmount" resultType="java.lang.Double" parameterType="java.lang.String">
+		SELECT sum(case a.pay_type when '2' then b.audit_cost_ft+b.audit_cost_ft_travel when '3' then b.audit_cost_ft_to_prj+b.audit_cost_ft_to_prj_travel else 0 end) 
+		    FROM cop_case_price_confirm a ,cop_case_detail_price b 
+		    WHERE a.status = 'A2' AND a.pay_type in ('2','3') AND a.once_num = b.once_num AND b.status = 'A0' 
+		    	AND (a.case_desc != 'no_count_value' or a.case_desc is null)
+			    AND a.sales_id in (
+			      SELECT b.staff_id from pub.t_sys_staff b where b.org_id in (
+			        SELECT t.org_id FROM pub.t_sys_staff t WHERE t.valid_flag = 'A0' AND t.staff_id = #{staffId}
+			      )
+			    ) 
+			    AND to_char(a.create_date, 'yyyy') = to_char(sysdate, 'yyyy') 
+			    AND a.dc_prj_id not in (
+			      SELECT p.dc_prj_id from cop_sales_org_project p where p.status = 'A0' and p.end_date > SYSDATE
+			   )
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cop_sales_org_account(
+			id,
+			account_id,
+			org_id,
+			org_name,
+			bu_name,
+			sign_amount,
+			case_max_amount,
+			case_used_amount,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{accountId},
+			#{orgId},
+			#{orgName},
+			#{buName},
+			#{signAmount},
+			#{caseMaxAmount},
+			#{caseUsedAmount},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cop_sales_org_account SET 	
+			account_id = #{accountId},
+			org_id = #{orgId},
+			org_name = #{orgName},
+			bu_name = #{buName},
+			sign_amount = #{signAmount},
+			case_max_amount = #{caseMaxAmount},
+			case_used_amount = #{caseUsedAmount},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cop_sales_org_account SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

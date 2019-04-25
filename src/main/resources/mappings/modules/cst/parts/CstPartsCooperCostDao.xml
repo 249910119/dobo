@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.parts.CstPartsCooperCostDao">
+    
+	<sql id="cstPartsCooperCostColumns">
+		a.id AS "id",
+		a.mfr_id AS "mfrId",
+		a.equiptype_id AS "equiptypeId",
+		a.equiptype_desc AS "equiptypeDesc",
+		a.pack_id AS "packId",
+		a.province AS "province",
+		a.date_id AS "dateId",
+		a.begin_date AS "beginDate",
+		a.end_date AS "endDate",
+		a.not_high_a AS "notHighA",
+		a.not_high_b AS "notHighB",
+		a.not_high_c AS "notHighC",
+		a.not_high_d AS "notHighD",
+		a.high_a AS "highA",
+		a.high_b AS "highB",
+		a.high_c AS "highC",
+		a.high_d AS "highD",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstPartsCooperCostJoins">
+	</sql>
+    
+	<select id="get" resultType="CstPartsCooperCost">
+		SELECT 
+			<include refid="cstPartsCooperCostColumns"/>
+		FROM cst_parts_cooper_cost a
+		<include refid="cstPartsCooperCostJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstPartsCooperCost">
+		SELECT 
+			<include refid="cstPartsCooperCostColumns"/>
+		FROM cst_parts_cooper_cost a
+		<include refid="cstPartsCooperCostJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstPartsCooperCost">
+		SELECT 
+			<include refid="cstPartsCooperCostColumns"/>
+		FROM cst_parts_cooper_cost a
+		<include refid="cstPartsCooperCostJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_parts_cooper_cost(
+			id,
+			mfr_id,
+			equiptype_id,
+			equiptype_desc,
+			pack_id,
+			province,
+			date_id,
+			begin_date,
+			end_date,
+			not_high_a,
+			not_high_b,
+			not_high_c,
+			not_high_d,
+			high_a,
+			high_b,
+			high_c,
+			high_d,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{mfrId},
+			#{equiptypeId},
+			#{equiptypeDesc},
+			#{packId},
+			#{province},
+			#{dateId},
+			#{beginDate},
+			#{endDate},
+			#{notHighA},
+			#{notHighB},
+			#{notHighC},
+			#{notHighD},
+			#{highA},
+			#{highB},
+			#{highC},
+			#{highD},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_parts_cooper_cost SET 	
+			mfr_id = #{mfrId},
+			equiptype_id = #{equiptypeId},
+			equiptype_desc = #{equiptypeDesc},
+			pack_id = #{packId},
+			province = #{province},
+			date_id = #{dateId},
+			begin_date = #{beginDate},
+			end_date = #{endDate},
+			not_high_a = #{notHighA},
+			not_high_b = #{notHighB},
+			not_high_c = #{notHighC},
+			not_high_d = #{notHighD},
+			high_a = #{highA},
+			high_b = #{highB},
+			high_c = #{highC},
+			high_d = #{highD},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_parts_cooper_cost SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

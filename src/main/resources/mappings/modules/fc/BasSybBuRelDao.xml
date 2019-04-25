@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.BasSybBuRelDao">
+	
+	<select id="findListByFiscalYear" resultType="BasSybBuRel">
+		SELECT 
+			<include refid="basSybBuRelColumns"/>
+		FROM bi.bas_syb_bu_rel a
+		<where>
+			a.fiscal_year = #{fiscalYear}
+		</where>
+	</select>
+    
+	<sql id="basSybBuRelColumns">
+		a.rel_id AS "relId",
+		a.sybmc AS "sybmc",
+		a.bumc AS "bumc",
+		a.fiscal_year AS "fiscalYear",
+		a.create_date AS "createDate",
+		a.remark AS "remark"
+	</sql>
+	
+	<sql id="basSybBuRelJoins">
+	</sql>
+    
+	<select id="get" resultType="BasSybBuRel">
+		SELECT 
+			<include refid="basSybBuRelColumns"/>
+		FROM bi.bas_syb_bu_rel a
+		<include refid="basSybBuRelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BasSybBuRel">
+		SELECT 
+			<include refid="basSybBuRelColumns"/>
+		FROM bi.bas_syb_bu_rel a
+		<include refid="basSybBuRelJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BasSybBuRel">
+		SELECT 
+			<include refid="basSybBuRelColumns"/>
+		FROM bi.bas_syb_bu_rel a
+		<include refid="basSybBuRelJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bi.bas_syb_bu_rel(
+			rel_id,
+			sybmc,
+			bumc,
+			fiscal_year,
+			create_date,
+			remark
+		) VALUES (
+			#{relId},
+			#{sybmc},
+			#{bumc},
+			#{fiscalYear},
+			#{createDate},
+			#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bi.bas_syb_bu_rel SET 	
+			rel_id = #{relId},
+			sybmc = #{sybmc},
+			bumc = #{bumc},
+			fiscal_year = #{fiscalYear},
+			remark = #{remark}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bi.bas_syb_bu_rel
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

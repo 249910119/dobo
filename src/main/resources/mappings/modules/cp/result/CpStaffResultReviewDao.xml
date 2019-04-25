@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cp.dao.result.CpStaffResultReviewDao">
+    
+	<sql id="cpStaffResultReviewColumns">
+		a.id AS "id",
+		a.staff_id AS "staffId",
+		a.staff_name AS "staffName",
+		a.rater_num AS "raterNum",
+		a.rater_level AS "raterLevel",
+		a.percents AS "percents",
+		a.job_level AS "jobLevel",
+		a.job_level_id AS "jobLevelId",
+		a.template_id AS "templateId",
+		a.number1 AS "number1",
+		a.number2 AS "number2",
+		a.number3 AS "number3",
+		a.number4 AS "number4",
+		a.number5 AS "number5",
+		a.number6 AS "number6",
+		a.number7 AS "number7",
+		a.number8 AS "number8",
+		a.number9 AS "number9",
+		a.number10 AS "number10",
+		a.number11 AS "number11",
+		a.number12 AS "number12",
+		a.number13 AS "number13",
+		a.number14 AS "number14",
+		a.number15 AS "number15",
+		a.number16 AS "number16",
+		a.number17 AS "number17",
+		a.number18 AS "number18",
+		a.number19 AS "number19",
+		a.number20 AS "number20",
+		a.number21 AS "number21",
+		a.number22 AS "number22",
+		a.number23 AS "number23",
+		a.number24 AS "number24",
+		a.remark1 AS "remark1",
+		a.remark2 AS "remark2",
+		a.remark3 AS "remark3",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.end_date AS "endDate",
+		a.grand_mean AS "grandMean",
+		b.full_org_name as "orgName"
+	</sql>
+	
+	<sql id="cpStaffResultReviewJoins">
+	</sql>
+    
+	<select id="get" resultType="CpStaffResultReview">
+		SELECT 
+			<include refid="cpStaffResultReviewColumns"/>
+		FROM cp_staff_result_review a left join cp_staff_info b on a.staff_id = b.staff_id
+		<include refid="cpStaffResultReviewJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CpStaffResultReview">
+		SELECT 
+			<include refid="cpStaffResultReviewColumns"/>
+		FROM cp_staff_result_review a left join cp_staff_info b on a.staff_id = b.staff_id
+		<include refid="cpStaffResultReviewJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} and a.status = 'A0'
+			<if test="jobLevelId != null and jobLevelId != ''">
+				AND a.job_level_id = #{jobLevelId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.staff_id,a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CpStaffResultReview">
+		SELECT 
+			<include refid="cpStaffResultReviewColumns"/>
+		FROM cp_staff_result_review a
+		<include refid="cpStaffResultReviewJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cp_staff_result_review(
+			id,
+			staff_id,
+			staff_name,
+			rater_num,
+			rater_level,
+			percents,
+			job_level,
+			job_level_id,
+			template_id,
+			number1,
+			number2,
+			number3,
+			number4,
+			number5,
+			number6,
+			number7,
+			number8,
+			number9,
+			number10,
+			number11,
+			number12,
+			number13,
+			number14,
+			number15,
+			number16,
+			number17,
+			number18,
+			number19,
+			number20,
+			number21,
+			number22,
+			number23,
+			number24,
+			remark1,
+			remark2,
+			remark3,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag,
+			end_date,
+			grand_mean
+		) VALUES (
+			#{id},
+			#{staffId},
+			#{staffName},
+			#{raterNum},
+			#{raterLevel},
+			#{percents},
+			#{jobLevel},
+			#{jobLevelId},
+			#{templateId},
+			#{number1},
+			#{number2},
+			#{number3},
+			#{number4},
+			#{number5},
+			#{number6},
+			#{number7},
+			#{number8},
+			#{number9},
+			#{number10},
+			#{number11},
+			#{number12},
+			#{number13},
+			#{number14},
+			#{number15},
+			#{number16},
+			#{number17},
+			#{number18},
+			#{number19},
+			#{number20},
+			#{number21},
+			#{number22},
+			#{number23},
+			#{number24},
+			#{remark1},
+			#{remark2},
+			#{remark3},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{endDate},
+			#{grandMean}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cp_staff_result_review SET 	
+			staff_id = #{staffId},
+			staff_name = #{staffName},
+			rater_num = #{raterNum},
+			rater_level = #{raterLevel},
+			percents = #{percents},
+			job_level = #{jobLevel},
+			job_level_id = #{jobLevelId},
+			template_id = #{templateId},
+			number1 = #{number1},
+			number2 = #{number2},
+			number3 = #{number3},
+			number4 = #{number4},
+			number5 = #{number5},
+			number6 = #{number6},
+			number7 = #{number7},
+			number8 = #{number8},
+			number9 = #{number9},
+			number10 = #{number10},
+			number11 = #{number11},
+			number12 = #{number12},
+			number13 = #{number13},
+			number14 = #{number14},
+			number15 = #{number15},
+			number16 = #{number16},
+			number17 = #{number17},
+			number18 = #{number18},
+			number19 = #{number19},
+			number20 = #{number20},
+			number21 = #{number21},
+			number22 = #{number22},
+			number23 = #{number23},
+			number24 = #{number24},
+			remark1 = #{remark1},
+			remark2 = #{remark2},
+			remark3 = #{remark3},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag},
+			end_date = #{endDate},
+			grand_mean = #{grandMean}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cp_staff_result_review SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

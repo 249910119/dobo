@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.base.CstBaseCaseLineoneDao">
+    
+	<sql id="cstBaseCaseLineoneColumns">
+		a.detail_id AS "detailId",
+		a.resource_id AS "resourceId",
+		a.resource_name AS "resourceName",
+		a.mfr_name AS "mfrName",
+		a.equip_type_name AS "equipTypeName",
+		a.modelgroup_name AS "modelgroupName",
+		a.resource_type_name AS "resourceTypeName",
+		a.resource_desc AS "resourceDesc",
+		a.sample_amount AS "sampleAmount",
+		a.line1_one_amount AS "line1OneAmount",
+		a.line1_two_amount AS "line1TwoAmount",
+		a.line1_thd_amount AS "line1ThdAmount",
+		a.line1_four_amount AS "line1FourAmount",
+		a.line1_five_amount AS "line1FiveAmount",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstBaseCaseLineoneJoins">
+	</sql>
+    
+	<select id="get" resultType="CstBaseCaseLineone">
+		SELECT 
+			<include refid="cstBaseCaseLineoneColumns"/>
+		FROM cst_base_case_lineone a
+		<include refid="cstBaseCaseLineoneJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstBaseCaseLineone">
+		SELECT 
+			<include refid="cstBaseCaseLineoneColumns"/>
+		FROM cst_base_case_lineone a
+		<include refid="cstBaseCaseLineoneJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstBaseCaseLineone">
+		SELECT 
+			<include refid="cstBaseCaseLineoneColumns"/>
+		FROM cst_base_case_lineone a
+		<include refid="cstBaseCaseLineoneJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_base_case_lineone(
+			detail_id,
+			resource_id,
+			resource_name,
+			mfr_name,
+			equip_type_name,
+			modelgroup_name,
+			resource_type_name,
+			resource_desc,
+			sample_amount,
+			line1_one_amount,
+			line1_two_amount,
+			line1_thd_amount,
+			line1_four_amount,
+			line1_five_amount,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{detailId},
+			#{resourceId},
+			#{resourceName},
+			#{mfrName},
+			#{equipTypeName},
+			#{modelgroupName},
+			#{resourceTypeName},
+			#{resourceDesc},
+			#{sampleAmount},
+			#{line1OneAmount},
+			#{line1TwoAmount},
+			#{line1ThdAmount},
+			#{line1FourAmount},
+			#{line1FiveAmount},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_base_case_lineone SET 	
+			detail_id = #{detailId},
+			resource_id = #{resourceId},
+			resource_name = #{resourceName},
+			mfr_name = #{mfrName},
+			equip_type_name = #{equipTypeName},
+			modelgroup_name = #{modelgroupName},
+			resource_type_name = #{resourceTypeName},
+			resource_desc = #{resourceDesc},
+			sample_amount = #{sampleAmount},
+			line1_one_amount = #{line1OneAmount},
+			line1_two_amount = #{line1TwoAmount},
+			line1_thd_amount = #{line1ThdAmount},
+			line1_four_amount = #{line1FourAmount},
+			line1_five_amount = #{line1FiveAmount},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_base_case_lineone SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

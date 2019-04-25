@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.check.CstCheckResmgrHourDao">
+    
+	<sql id="cstCheckResmgrHourColumns">
+		a.id AS "id",
+		a.pmo_check_hour AS "pmoCheckHour",
+		a.res_mgr_check_hour AS "resMgrCheckHour",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstCheckResmgrHourJoins">
+	</sql>
+    
+	<select id="get" resultType="CstCheckResmgrHour">
+		SELECT 
+			<include refid="cstCheckResmgrHourColumns"/>
+		FROM cst_check_resmgr_hour a
+		<include refid="cstCheckResmgrHourJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstCheckResmgrHour">
+		SELECT 
+			<include refid="cstCheckResmgrHourColumns"/>
+		FROM cst_check_resmgr_hour a
+		<include refid="cstCheckResmgrHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="pmoCheckHour != null and pmoCheckHour != ''">
+				AND a.pmo_check_hour = #{pmoCheckHour}
+			</if>
+			<if test="resMgrCheckHour != null and resMgrCheckHour != ''">
+				AND a.res_mgr_check_hour = #{resMgrCheckHour}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstCheckResmgrHour">
+		SELECT 
+			<include refid="cstCheckResmgrHourColumns"/>
+		FROM cst_check_resmgr_hour a
+		<include refid="cstCheckResmgrHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_check_resmgr_hour(
+			id,
+			pmo_check_hour,
+			res_mgr_check_hour,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{pmoCheckHour},
+			#{resMgrCheckHour},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_check_resmgr_hour SET 	
+			pmo_check_hour = #{pmoCheckHour},
+			res_mgr_check_hour = #{resMgrCheckHour},
+			status = #{status},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_check_resmgr_hour SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

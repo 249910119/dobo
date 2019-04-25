@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.cases.CstCaseStandHourScaleDao">
+    
+	<sql id="cstCaseStandHourScaleColumns">
+		a.id AS "id",
+		a.prod_id AS "prodId",
+		a.prod_desc AS "prodDesc",
+		a.paytype_id AS "paytypeId",
+		a.paytype_desc AS "paytypeDesc",
+		a.year_failure_rate AS "yearFailureRate",
+		a.cmo_once_hour AS "cmoOnceHour",
+		a.line2_once_hour AS "line2OnceHour",
+		a.pm_once_hour AS "pmOnceHour",
+		a.res_mgr_once_hour AS "resMgrOnceHour",
+		a.line2_level4_scale AS "line2Level4Scale",
+		a.line2_level5_scale AS "line2Level5Scale",
+		a.line2_level6_scale AS "line2Level6Scale",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstCaseStandHourScaleJoins">
+	</sql>
+    
+	<select id="get" resultType="CstCaseStandHourScale">
+		SELECT 
+			<include refid="cstCaseStandHourScaleColumns"/>
+		FROM cst_case_stand_hour_scale a
+		<include refid="cstCaseStandHourScaleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstCaseStandHourScale">
+		SELECT 
+			<include refid="cstCaseStandHourScaleColumns"/>
+		FROM cst_case_stand_hour_scale a
+		<include refid="cstCaseStandHourScaleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstCaseStandHourScale">
+		SELECT 
+			<include refid="cstCaseStandHourScaleColumns"/>
+		FROM cst_case_stand_hour_scale a
+		<include refid="cstCaseStandHourScaleJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_case_stand_hour_scale(
+			id,
+			prod_id,
+			prod_desc,
+			paytype_id,
+			paytype_desc,
+			year_failure_rate,
+			cmo_once_hour,
+			line2_once_hour,
+			pm_once_hour,
+			res_mgr_once_hour,
+			line2_level4_scale,
+			line2_level5_scale,
+			line2_level6_scale,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{prodId},
+			#{prodDesc},
+			#{paytypeId},
+			#{paytypeDesc},
+			#{yearFailureRate},
+			#{cmoOnceHour},
+			#{line2OnceHour},
+			#{pmOnceHour},
+			#{resMgrOnceHour},
+			#{line2Level4Scale},
+			#{line2Level5Scale},
+			#{line2Level6Scale},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_case_stand_hour_scale SET 	
+			prod_id = #{prodId},
+			prod_desc = #{prodDesc},
+			paytype_id = #{paytypeId},
+			paytype_desc = #{paytypeDesc},
+			year_failure_rate = #{yearFailureRate},
+			cmo_once_hour = #{cmoOnceHour},
+			line2_once_hour = #{line2OnceHour},
+			pm_once_hour = #{pmOnceHour},
+			res_mgr_once_hour = #{resMgrOnceHour},
+			line2_level4_scale = #{line2Level4Scale},
+			line2_level5_scale = #{line2Level5Scale},
+			line2_level6_scale = #{line2Level6Scale},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_case_stand_hour_scale SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

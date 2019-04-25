@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cop.dao.detail.CopSalesAccountDao">
+    
+	<sql id="copSalesAccountColumns">
+		a.id AS "id",
+		a.account_id AS "accountId",
+		a.dc_prj_id AS "dcPrjId",
+		a.dc_prj_name AS "dcPrjName",
+		a.order_id AS "orderId",
+		a.staff_id AS "staffId",
+		a.prj_type AS "prjType",
+		a.prod_amount AS "prodAmount",
+		a.final_amount AS "finalAmount",
+		a.used_amount AS "usedAmount",
+		a.back_prod_amount AS "backProdAmount",
+		a.back_final_amount AS "backFinalAmount",
+		a.back_used_amount AS "backUsedAmount",
+		a.is_shared AS "isShared",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.service_begin AS "serviceBegin",
+		a.service_end AS "serviceEnd",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="copSalesAccountJoins">
+	</sql>
+    
+	<select id="get" resultType="CopSalesAccount">
+		SELECT 
+			<include refid="copSalesAccountColumns"/>
+		FROM cop_sales_account a
+		<include refid="copSalesAccountJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findStaffPrjList" resultType="CopSalesAccount">
+		SELECT 
+			<include refid="copSalesAccountColumns"/>
+		FROM cop_sales_account a
+		<include refid="copSalesAccountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} and a.status = 'A0'
+			<if test="dcPrjId != null and dcPrjId != ''">
+				AND a.dc_prj_id = #{dcPrjId}
+			</if>
+			<if test="staffId != null and staffId != '' and isShared != null and isShared != ''">
+				OR (a.staff_id = #{staffId} AND a.is_shared = #{isShared} and a.status = 'A0')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findList" resultType="CopSalesAccount">
+		SELECT 
+			<include refid="copSalesAccountColumns"/>
+		FROM cop_sales_account a
+		<include refid="copSalesAccountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="dcPrjId != null and dcPrjId != ''">
+				AND a.dc_prj_id = #{dcPrjId}
+			</if>
+			<if test="staffId != null and staffId != ''">
+				AND a.staff_id = #{staffId}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="statusChangeDate != null">
+				AND (#{statusChangeDate} between a.service_begin and a.service_end)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CopSalesAccount">
+		SELECT 
+			<include refid="copSalesAccountColumns"/>
+		FROM cop_sales_account a
+		<include refid="copSalesAccountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cop_sales_account(
+			id,
+			account_id,
+			dc_prj_id,
+			dc_prj_name,
+			order_id,
+			staff_id,
+			prj_type,
+			prod_amount,
+			final_amount,
+			used_amount,
+			back_prod_amount,
+			back_final_amount,
+			back_used_amount,
+			is_shared,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			service_begin,
+			service_end,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{accountId},
+			#{dcPrjId},
+			#{dcPrjName},
+			#{orderId},
+			#{staffId},
+			#{prjType},
+			#{prodAmount},
+			#{finalAmount},
+			#{usedAmount},
+			#{backProdAmount},
+			#{backFinalAmount},
+			#{backUsedAmount},
+			#{isShared},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{serviceBegin},
+			#{serviceEnd},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cop_sales_account SET 	
+			account_id = #{accountId},
+			dc_prj_id = #{dcPrjId},
+			dc_prj_name = #{dcPrjName},
+			order_id = #{orderId},
+			staff_id = #{staffId},
+			prj_type = #{prjType},
+			prod_amount = #{prodAmount},
+			final_amount = #{finalAmount},
+			used_amount = #{usedAmount},
+			back_prod_amount = #{backProdAmount},
+			back_final_amount = #{backFinalAmount},
+			back_used_amount = #{backUsedAmount},
+			is_shared = #{isShared},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			service_begin = #{serviceBegin},
+			service_end = #{serviceEnd},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cop_sales_account SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

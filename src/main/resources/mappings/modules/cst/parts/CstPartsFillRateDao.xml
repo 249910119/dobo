@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.parts.CstPartsFillRateDao">
+    
+	<sql id="cstPartsFillRateColumns">
+		a.id AS "id",
+		a.province AS "province",
+		a.store_level AS "storeLevel",
+		a.local_fill_rate AS "localFillRate",
+		a.fill_rate AS "fillRate",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.save_Flag AS "saveFlag",
+		a.status_change_date AS "statusChangeDate"
+	</sql>
+	
+	<sql id="cstPartsFillRateJoins">
+	</sql>
+    
+	<select id="get" resultType="CstPartsFillRate">
+		SELECT 
+			<include refid="cstPartsFillRateColumns"/>
+		FROM cst_parts_fill_rate a
+		<include refid="cstPartsFillRateJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstPartsFillRate">
+		SELECT 
+			<include refid="cstPartsFillRateColumns"/>
+		FROM cst_parts_fill_rate a
+		<include refid="cstPartsFillRateJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="province != null and province != ''">
+				AND a.province = #{province}
+			</if>
+			<if test="storeLevel != null and storeLevel != ''">
+				AND a.store_level = #{storeLevel}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstPartsFillRate">
+		SELECT 
+			<include refid="cstPartsFillRateColumns"/>
+		FROM cst_parts_fill_rate a
+		<include refid="cstPartsFillRateJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_parts_fill_rate(
+			id,
+			province,
+			store_level,
+			local_fill_rate,
+			fill_rate,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			save_flag,
+			status_change_date
+		) VALUES (
+			#{id},
+			#{province},
+			#{storeLevel},
+			#{localFillRate},
+			#{fillRate},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{saveFlag}
+			#{statusChangeDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_parts_fill_rate SET 	
+			province = #{province},
+			store_level = #{storeLevel},
+			local_fill_rate = #{localFillRate},
+			fill_rate = #{fillRate},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag},
+			pre_status = #{preStatus},
+			save_Flag = #{saveFlag},
+			status_change_date = #{statusChangeDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_parts_fill_rate SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

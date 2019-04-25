@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.detail.CstOrderDetailInfoDao">
+    
+	<sql id="cstOrderDetailInfoColumns">
+		a.id AS "id",
+		a.order_id AS "orderId",
+		a.prod_name AS "prodName",
+		a.detail_id AS "detailId",
+		a.mfr_name AS "mfrName",
+		a.amount AS "amount",
+		a.resource_name AS "resourceName",
+		a.sla_name AS "slaName",
+		a.city AS "city",
+		a.begin_date AS "beginDate",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.end_date AS "endDate",
+		a.create_date AS "createDate",
+		a.check_n AS "checkN",
+		a.update_by AS "updateBy.id",
+		a.check_f AS "checkF",
+		a.update_date AS "updateDate",
+		a.check_d AS "checkD",
+		a.urgent AS "urgent",
+		a.remarks AS "remarks",
+		a.workkind_scale AS "workkindScale",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="wbmOrderDetailInfoColumns">
+		a.pd_id AS "detailId",
+		a.dc_prj_id AS "dcPrjId",
+	    a.order_id AS "orderId",
+	    <!-- a.prod_stat_type AS "prodName", -->
+	    a.prod_name AS "prodName",
+	    a.mfr_name AS "mfrName",
+	    a.resource_amount AS "amount",
+	    a.resource_model AS "resourceName",
+	    a.sla_name AS "slaName",
+	    a.city AS "city",
+	    a.service_begin AS "beginDate",
+	    a.service_end AS "endDate",
+	    a.service_time AS "checkN",
+	    a.tel_service_time AS "checkF",
+	    a.deep_service_time AS "checkD",
+	    a.urgent AS "urgent",
+	    a.workkind_scale AS "workkindScale",
+	    a.final_carrycost AS "byFee",
+	    a.final_ptoscost AS "clzsFee",
+	    a.prod_service_mode AS "prodServiceModel",
+	    a.final_mancost AS "finalManCost",
+	    a.final_backcost AS "finalBackCost",
+	    a.final_riskAbilityCost AS "finalRiskAbilityCost",
+	    a.final_urgeCost AS "finalUrgeCost",
+	    a.status AS "status"
+	</sql>
+	
+	<sql id="cstOrderDetailInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="CstOrderDetailInfo">
+		SELECT 
+			<include refid="cstOrderDetailInfoColumns"/>
+		FROM cst_order_detail_info a
+		<include refid="cstOrderDetailInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstOrderDetailInfo">
+		SELECT 
+			<include refid="cstOrderDetailInfoColumns"/>
+		FROM cst_order_detail_info a
+		<include refid="cstOrderDetailInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orderId != null and orderId != ''">
+				AND a.order_id = #{orderId}
+			</if>
+			<if test="prodId != null and prodId != ''">
+				AND a.prod_id = #{prodId}
+			</if>
+			<if test="detailId != null and detailId != ''">
+				AND a.detail_id = #{detailId}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getWbmBaseList" resultType="CstOrderDetailInfo">
+		SELECT 
+			<include refid="wbmOrderDetailInfoColumns"/>
+		FROM prod.t_sta_projectorderdetail a,cst_in_project b
+		<where>
+			<![CDATA[ 
+			    a.dc_prj_id = b.dc_prj_id AND
+				a.prj_type <> '分销' AND a.CLOSE_STATUS IS NULL 
+				AND ( 
+					(A.STATUS = 'A0' AND TO_CHAR(A.CREATE_DATE, 'yyyyMMdd') <= #{createDateStr})
+				  	OR
+				  	(A.STATUS = 'A1' AND A.PRE_STATUS = 'A0' AND TO_CHAR(A.CREATE_DATE, 'yyyyMMdd') <= #{createDateStr} AND TO_CHAR(A.STATUS_CHANGE_DATE, 'yyyyMMdd') > #{createDateStr})
+				)
+			]]>
+			<if test="execOrgNames != null">
+				AND a.exec_org_name in
+				<foreach collection="execOrgNames" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+           		</foreach>
+			</if>
+			<if test="supportTypes != null">
+				AND a.support_type in
+				<foreach collection="supportTypes" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+            	</foreach>
+			</if>
+			<if test="costClassNames != null">
+				AND a.cost_class_name in
+				<foreach collection="costClassNames" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+              	</foreach>
+			</if>
+			<if test="prodServiceModes != null">
+				AND a.prod_service_mode in
+				<foreach collection="prodServiceModes" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+				</foreach>
+			</if>
+			<if test="prodName != null">
+				AND a.prod_name in
+				<foreach collection="prodName" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+				</foreach>
+			</if>
+			<if test="prodStatTypes != null">
+				AND a.prod_stat_type in
+				<foreach collection="prodStatTypes" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+				</foreach>
+			</if>
+			<if test="pdId != null and pdId != ''">
+				AND a.prod_id = #{pdId}
+			</if>
+			<if test="dcPrjId != null and dcPrjId != ''">
+				AND a.dc_prj_id = #{dcPrjId}
+			</if>
+		</where>
+			ORDER BY a.dc_prj_id DESC
+	</select>
+	
+	<select id="findAllList" resultType="CstOrderDetailInfo">
+		SELECT 
+			<include refid="cstOrderDetailInfoColumns"/>
+		FROM cst_order_detail_info a
+		<include refid="cstOrderDetailInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_order_detail_info(
+			id,
+			order_id,
+			prod_name,
+			detail_id,
+			mfr_name,
+			amount,
+			resource_name,
+			sla_name,
+			city,
+			begin_date,
+			status,
+			create_by,
+			end_date,
+			create_date,
+			check_n,
+			update_by,
+			check_f,
+			update_date,
+			check_d,
+			urgent,
+			remarks,
+			workkind_scale,
+			del_flag
+		) VALUES (
+			#{id},
+			#{orderId},
+			#{prodName},
+			#{detailId},
+			#{mfrName},
+			#{amount},
+			#{resourceName},
+			#{slaName},
+			#{city},
+			#{beginDate},
+			#{status},
+			#{createBy.id},
+			#{endDate},
+			#{createDate},
+			#{checkN},
+			#{updateBy.id},
+			#{checkF},
+			#{updateDate},
+			#{checkD},
+			#{urgent},
+			#{remarks},
+			#{workkindScale},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_order_detail_info SET 	
+			order_id = #{orderId},
+			prod_name = #{prodName},
+			detail_id = #{detailId},
+			mfr_name = #{mfrName},
+			amount = #{amount},
+			resource_name = #{resourceName},
+			sla_name = #{slaName},
+			city = #{city},
+			begin_date = #{beginDate},
+			status = #{status},
+			end_date = #{endDate},
+			check_n = #{checkN},
+			update_by = #{updateBy.id},
+			check_f = #{checkF},
+			update_date = #{updateDate},
+			check_d = #{checkD},
+			urgent = #{urgent},
+			workkind_scale = #{workkindScale},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_order_detail_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

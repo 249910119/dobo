@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cop.dao.detail.CopSalesOrgProjectDao">
+    
+	<sql id="copSalesOrgProjectColumns">
+		a.id AS "id",
+		a.dc_prj_id AS "dcPrjId",
+		a.dc_prj_name AS "dcPrjName",
+		a.org_id AS "orgId",
+		a.org_name AS "orgName",
+		a.sale_id AS "saleId",
+		a.fiscal_year AS "fiscalYear",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.end_date AS "endDate"
+	</sql>
+	
+	<sql id="copSalesOrgProjectJoins">
+	</sql>
+    
+	<select id="get" resultType="CopSalesOrgProject">
+		SELECT 
+			<include refid="copSalesOrgProjectColumns"/>
+		FROM cop_sales_org_project a
+		<include refid="copSalesOrgProjectJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CopSalesOrgProject">
+		SELECT 
+			<include refid="copSalesOrgProjectColumns"/>
+		FROM cop_sales_org_project a
+		<include refid="copSalesOrgProjectJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="dcPrjId != null and dcPrjId != ''"> 
+				AND a.dc_prj_id = #{dcPrjId}
+			</if>
+			<if test="status != null and status != ''"> 
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CopSalesOrgProject">
+		SELECT 
+			<include refid="copSalesOrgProjectColumns"/>
+		FROM cop_sales_org_project a
+		<include refid="copSalesOrgProjectJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cop_sales_org_project(
+			id,
+			dc_prj_id,
+			dc_prj_name,
+			org_id,
+			org_name,
+			sale_id,
+			fiscal_year,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag,
+			end_date
+		) VALUES (
+			#{id},
+			#{dcPrjId},
+			#{dcPrjName},
+			#{orgId},
+			#{orgName},
+			#{saleId},
+			#{fiscalYear},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{endDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cop_sales_org_project SET 	
+			dc_prj_id = #{dcPrjId},
+			dc_prj_name = #{dcPrjName},
+			org_id = #{orgId},
+			org_name = #{orgName},
+			sale_id = #{saleId},
+			fiscal_year = #{fiscalYear},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag},
+			end_date = #{endDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cop_sales_org_project SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

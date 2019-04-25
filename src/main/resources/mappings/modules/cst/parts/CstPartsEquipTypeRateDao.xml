@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.parts.CstPartsEquipTypeRateDao">
+    
+	<sql id="cstPartsEquipTypeRateColumns">
+		a.id AS "id",
+		a.equiptype_id AS "equiptypeId",
+		a.equiptype_desc AS "equiptypeDesc",
+		a.equip_man_rate AS "equipManRate",
+		a.equip_urge_rate AS "equipUrgeRate",
+		a.sla_cost_rate AS "slaCostRate",
+		a.his_parts_amount AS "hisPartsAmount",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstPartsEquipTypeRateJoins">
+	</sql>
+    
+	<select id="get" resultType="CstPartsEquipTypeRate">
+		SELECT 
+			<include refid="cstPartsEquipTypeRateColumns"/>
+		FROM cst_parts_equip_type_rate a
+		<include refid="cstPartsEquipTypeRateJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstPartsEquipTypeRate">
+		SELECT 
+			<include refid="cstPartsEquipTypeRateColumns"/>
+		FROM cst_parts_equip_type_rate a
+		<include refid="cstPartsEquipTypeRateJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="equiptypeId != null and equiptypeId != ''">
+				AND a.equiptype_id = #{equiptypeId}
+			</if>
+			<if test="equiptypeDesc != null and equiptypeDesc != ''">
+				AND a.equiptype_desc = #{equiptypeDesc}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstPartsEquipTypeRate">
+		SELECT 
+			<include refid="cstPartsEquipTypeRateColumns"/>
+		FROM cst_parts_equip_type_rate a
+		<include refid="cstPartsEquipTypeRateJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_parts_equip_type_rate(
+			id,
+			equiptype_id,
+			equiptype_desc,
+			equip_man_rate,
+			equip_urge_rate,
+			sla_cost_rate,
+			his_parts_amount,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{equiptypeId},
+			#{equiptypeDesc},
+			#{equipManRate},
+			#{equipUrgeRate},
+			#{slaCostRate},
+			#{hisPartsAmount},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_parts_equip_type_rate SET 	
+			equiptype_id = #{equiptypeId},
+			equiptype_desc = #{equiptypeDesc},
+			equip_man_rate = #{equipManRate},
+			equip_urge_rate = #{equipUrgeRate},
+			sla_cost_rate = #{slaCostRate},
+			his_parts_amount = #{hisPartsAmount},
+			status = #{status},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_parts_equip_type_rate SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.parts.CstPartsFailureRateCostDao">
+    
+	<sql id="cstPartsFailureRateCostColumns">
+		a.id AS "id",
+		a.resource_id AS "resourceId",
+		a.resource_desc AS "resourceDesc",
+		a.parts_type_name AS "partsTypeName",
+		a.failure_rate AS "failureRate",
+		a.average_cost AS "averageCost",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstPartsFailureRateCostJoins">
+	</sql>
+    
+	<select id="get" resultType="CstPartsFailureRateCost">
+		SELECT 
+			<include refid="cstPartsFailureRateCostColumns"/>
+		FROM cst_parts_failure_rate_cost a
+		<include refid="cstPartsFailureRateCostJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstPartsFailureRateCost">
+		SELECT 
+			<include refid="cstPartsFailureRateCostColumns"/>
+		FROM cst_parts_failure_rate_cost a
+		<include refid="cstPartsFailureRateCostJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="resourceId != null and resourceId != ''">
+				AND a.resource_id = #{resourceId}
+			</if>
+			<if test="resourceDesc != null and resourceDesc != ''">
+				AND a.resource_desc = #{resourceDesc}
+			</if>
+			<if test="partsTypeName != null and partsTypeName != ''">
+				AND a.parts_type_name = #{partsTypeName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstPartsFailureRateCost">
+		SELECT 
+			<include refid="cstPartsFailureRateCostColumns"/>
+		FROM cst_parts_failure_rate_cost a
+		<include refid="cstPartsFailureRateCostJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_parts_failure_rate_cost(
+			id,
+			resource_id,
+			resource_desc,
+			parts_type_name,
+			failure_rate,
+			average_cost,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{resourceId},
+			#{resourceDesc},
+			#{partsTypeName},
+			#{failureRate},
+			#{averageCost},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_parts_failure_rate_cost SET 	
+			resource_id = #{resourceId},
+			resource_desc = #{resourceDesc},
+			parts_type_name = #{partsTypeName},
+			failure_rate = #{failureRate},
+			average_cost = #{averageCost},
+			status = #{status},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_parts_failure_rate_cost SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

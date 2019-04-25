@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.base.CstBaseCaseHourDao">
+    
+	<sql id="cstBaseCaseHourColumns">
+		a.detail_id AS "detailId",
+		a.mfr_name AS "mfrName",
+		a.equip_type_name AS "equipTypeName",
+		a.modelgroup_name AS "modelgroupName",
+		a.resource_desc AS "resourceDesc",
+		a.lineone_case_hour AS "lineoneCaseHour",
+		a.remote_case_hour AS "remoteCaseHour",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstBaseCaseHourJoins">
+	</sql>
+    
+	<select id="get" resultType="CstBaseCaseHour">
+		SELECT 
+			<include refid="cstBaseCaseHourColumns"/>
+		FROM cst_base_case_hour a
+		<include refid="cstBaseCaseHourJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstBaseCaseHour">
+		SELECT 
+			<include refid="cstBaseCaseHourColumns"/>
+		FROM cst_base_case_hour a
+		<include refid="cstBaseCaseHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstBaseCaseHour">
+		SELECT 
+			<include refid="cstBaseCaseHourColumns"/>
+		FROM cst_base_case_hour a
+		<include refid="cstBaseCaseHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_base_case_hour(
+			detail_id,
+			mfr_name,
+			equip_type_name,
+			modelgroup_name,
+			resource_desc,
+			lineone_case_hour,
+			remote_case_hour,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{detailId},
+			#{mfrName},
+			#{equipTypeName},
+			#{modelgroupName},
+			#{resourceDesc},
+			#{lineoneCaseHour},
+			#{remoteCaseHour},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_base_case_hour SET 	
+			detail_id = #{detailId},
+			mfr_name = #{mfrName},
+			equip_type_name = #{equipTypeName},
+			modelgroup_name = #{modelgroupName},
+			resource_desc = #{resourceDesc},
+			lineone_case_hour = #{lineoneCaseHour},
+			remote_case_hour = #{remoteCaseHour},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_base_case_hour SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

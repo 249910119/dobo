@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.parts.CstPartsTransportCostDao">
+    
+	<sql id="cstPartsTransportCostColumns">
+		a.id AS "id",
+		a.sla_level AS "slaLevel",
+		a.delivery_type AS "deliveryType",
+		a.local_fill_rate AS "localFillRate",
+		a.city AS "city",
+		a.province AS "province",
+		a.transport_type AS "transportType",
+		a.city_level AS "cityLevel",
+		a.trans_province_cost AS "transProvinceCost",
+		a.local_city_cost AS "localCityCost",
+		a.third_delivery_cost AS "thirdDeliveryCost",
+		a.third_pick_cost AS "thirdPickCost",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstPartsTransportCostJoins">
+	</sql>
+    
+	<select id="get" resultType="CstPartsTransportCost">
+		SELECT 
+			<include refid="cstPartsTransportCostColumns"/>
+		FROM cst_parts_transport_cost a
+		<include refid="cstPartsTransportCostJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstPartsTransportCost">
+		SELECT 
+			<include refid="cstPartsTransportCostColumns"/>
+		FROM cst_parts_transport_cost a
+		<include refid="cstPartsTransportCostJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="slaLevel != null and slaLevel != ''">
+				AND a.sla_level = #{slaLevel}
+			</if>
+			<if test="deliveryType != null and deliveryType != ''">
+				AND a.delivery_type = #{deliveryType}
+			</if>
+			<if test="city != null and city != ''">
+				AND a.city = #{city}
+			</if>
+			<if test="transportType != null and transportType != ''">
+				AND a.transport_type = #{transportType}
+			</if>
+			<if test="cityLevel != null and cityLevel != ''">
+				AND a.city_level = #{cityLevel}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstPartsTransportCost">
+		SELECT 
+			<include refid="cstPartsTransportCostColumns"/>
+		FROM cst_parts_transport_cost a
+		<include refid="cstPartsTransportCostJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_parts_transport_cost(
+			id,
+			sla_level,
+			delivery_type,
+			local_fill_rate,
+			city,
+			province,
+			transport_type,
+			city_level,
+			trans_province_cost,
+			local_city_cost,
+			third_delivery_cost,
+			third_pick_cost,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{slaLevel},
+			#{deliveryType},
+			#{localFillRate},
+			#{city},
+			#{province},
+			#{transportType},
+			#{cityLevel},
+			#{transProvinceCost},
+			#{localCityCost},
+			#{thirdDeliveryCost},
+			#{thirdPickCost},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_parts_transport_cost SET 	
+			sla_level = #{slaLevel},
+			delivery_type = #{deliveryType},
+			local_fill_rate = #{localFillRate},
+			city = #{city},
+			province = #{province},
+			transport_type = #{transportType},
+			city_level = #{cityLevel},
+			trans_province_cost = #{transProvinceCost},
+			local_city_cost = #{localCityCost},
+			third_delivery_cost = #{thirdDeliveryCost},
+			third_pick_cost = #{thirdPickCost},
+			status = #{status},
+			remarks = #{remarks},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_parts_transport_cost SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

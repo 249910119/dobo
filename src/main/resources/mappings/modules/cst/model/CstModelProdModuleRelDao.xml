@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.model.CstModelProdModuleRelDao">
+    
+	<sql id="cstModelProdModuleRelColumns">
+		a.id AS "id",
+		a.cpm_name AS "cpmName",
+		a.module_id AS "moduleId",
+		a.prod_id AS "prodId",
+		a.status AS "status",
+		a.class_name AS "className",
+		a.cal_order AS "calOrder",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a1.id AS "cstModelModuleInfo.id",
+		a1.module_name AS "cstModelModuleInfo.moduleName"
+	</sql>
+	
+	<sql id="cstModelProdModuleRelJoins">
+		LEFT JOIN cst_model_module_info a1 ON a1.id = a.module_id
+	</sql>
+    
+	<select id="get" resultType="CstModelProdModuleRel">
+		SELECT 
+			<include refid="cstModelProdModuleRelColumns"/>
+		FROM cst_model_prod_module_rel a
+		<include refid="cstModelProdModuleRelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstModelProdModuleRel">
+		SELECT 
+			<include refid="cstModelProdModuleRelColumns"/>
+		FROM cst_model_prod_module_rel a
+		<include refid="cstModelProdModuleRelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="cpmName != null and cpmName != ''">
+				AND a.cpm_name = #{cpmName}
+			</if>
+			<if test="prodId != null and prodId != ''">
+				AND a.prod_id = #{prodId}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="moduleId != null and moduleId != ''">
+				AND a.module_id = #{moduleId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstModelProdModuleRel">
+		SELECT 
+			<include refid="cstModelProdModuleRelColumns"/>
+		FROM cst_model_prod_module_rel a
+		<include refid="cstModelProdModuleRelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} and a.status = 'A0'
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.prod_id,a.cal_order
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_model_prod_module_rel(
+			id,
+			cpm_name,
+			module_id,
+			prod_id,
+			status,
+			class_name,
+			cal_order,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{cpmName},
+			#{moduleId},
+			#{prodId},
+			#{status},
+			#{className},
+			#{calOrder},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_model_prod_module_rel SET 	
+			cpm_name = #{cpmName},
+			module_id = #{moduleId},
+			prod_id = #{prodId},
+			status = #{status},
+			class_name = #{className},
+			cal_order = #{calOrder},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_model_prod_module_rel SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

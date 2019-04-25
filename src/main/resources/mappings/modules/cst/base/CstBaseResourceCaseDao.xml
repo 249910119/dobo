@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.base.CstBaseResourceCaseDao">
+    
+	<sql id="cstBaseResourceCaseColumns">
+		a.detail_id AS "detailId",
+		a.resource_id AS "resourceId",
+		a.resource_name AS "resourceName",
+		a.resource_class AS "resourceClass",
+		a.mfr_name AS "mfrName",
+		a.equip_type_name AS "equipTypeName",
+		a.modelgroup_name AS "modelgroupName",
+		a.resource_type_name AS "resourceTypeName",
+		a.resource_desc AS "resourceDesc",
+		a.case_amount AS "caseAmount",
+		a.year_sample_amount AS "yearSampleAmount",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstBaseResourceCaseJoins">
+	</sql>
+    
+	<select id="get" resultType="CstBaseResourceCase">
+		SELECT 
+			<include refid="cstBaseResourceCaseColumns"/>
+		FROM cst_base_resource_case a
+		<include refid="cstBaseResourceCaseJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstBaseResourceCase">
+		SELECT 
+			<include refid="cstBaseResourceCaseColumns"/>
+		FROM cst_base_resource_case a
+		<include refid="cstBaseResourceCaseJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstBaseResourceCase">
+		SELECT 
+			<include refid="cstBaseResourceCaseColumns"/>
+		FROM cst_base_resource_case a
+		<include refid="cstBaseResourceCaseJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_base_resource_case(
+			detail_id,
+			resource_id,
+			resource_name,
+			resource_class,
+			mfr_name,
+			equip_type_name,
+			modelgroup_name,
+			resource_type_name,
+			resource_desc,
+			case_amount,
+			year_sample_amount,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{detailId},
+			#{resourceId},
+			#{resourceName},
+			#{resourceClass},
+			#{mfrName},
+			#{equipTypeName},
+			#{modelgroupName},
+			#{resourceTypeName},
+			#{resourceDesc},
+			#{caseAmount},
+			#{yearSampleAmount},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_base_resource_case SET 	
+			detail_id = #{detailId},
+			resource_id = #{resourceId},
+			resource_name = #{resourceName},
+			resource_class = #{resourceClass},
+			mfr_name = #{mfrName},
+			equip_type_name = #{equipTypeName},
+			modelgroup_name = #{modelgroupName},
+			resource_type_name = #{resourceTypeName},
+			resource_desc = #{resourceDesc},
+			case_amount = #{caseAmount},
+			year_sample_amount = #{yearSampleAmount},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_base_resource_case SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

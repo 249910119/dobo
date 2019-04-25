@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.detail.CstOrderBackCostInfoDao">
+    
+	<sql id="cstOrderBackCostInfoColumns">
+		a.id AS "id",
+		a.dc_prj_id AS "dcPrjId",
+		a.order_id AS "orderId",
+		a.detail_id AS "detailId",
+		a.prod_id AS "prodId",
+		a.resource_id AS "resourceId",
+		a.province AS "province",
+		a.city AS "city",
+		a.sla AS "sla",
+		a.amount AS "amount",
+		a.begin_date AS "beginDate",
+		a.end_date AS "endDate",
+		a.back_cost AS "backCost",
+		a.pack_id AS "packId",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstOrderBackCostInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="CstOrderBackCostInfo">
+		SELECT 
+			<include refid="cstOrderBackCostInfoColumns"/>
+		FROM cst_order_back_cost_info a
+		<include refid="cstOrderBackCostInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstOrderBackCostInfo">
+		SELECT 
+			<include refid="cstOrderBackCostInfoColumns"/>
+		FROM cst_order_back_cost_info a
+		<include refid="cstOrderBackCostInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstOrderBackCostInfo">
+		SELECT 
+			<include refid="cstOrderBackCostInfoColumns"/>
+		FROM cst_order_back_cost_info a
+		<include refid="cstOrderBackCostInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_order_back_cost_info(
+			id,
+			dc_prj_id,
+			order_id,
+			detail_id,
+			prod_id,
+			resource_id,
+			province,
+			city,
+			sla,
+			amount,
+			begin_date,
+			end_date,
+			back_cost,
+			pack_id,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{dcPrjId},
+			#{orderId},
+			#{detailId},
+			#{prodId},
+			#{resourceId},
+			#{province},
+			#{city},
+			#{sla},
+			#{amount},
+			#{beginDate},
+			#{endDate},
+			#{backCost},
+			#{packId},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_order_back_cost_info SET 	
+			dc_prj_id = #{dcPrjId},
+			order_id = #{orderId},
+			detail_id = #{detailId},
+			prod_id = #{prodId},
+			resource_id = #{resourceId},
+			province = #{province},
+			city = #{city},
+			sla = #{sla},
+			amount = #{amount},
+			begin_date = #{beginDate},
+			end_date = #{endDate},
+			back_cost = #{backCost},
+			pack_id = #{packId},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_order_back_cost_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

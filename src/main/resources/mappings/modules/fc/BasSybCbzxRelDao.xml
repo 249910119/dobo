@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.BasSybCbzxRelDao">
+	
+	<select id="findListByFiscalYear" resultType="BasSybCbzxRel">
+		SELECT 
+			<include refid="basSybCbzxRelColumns"/>
+		FROM bi.bas_syb_cbzx_rel a
+		<where>
+			a.fiscal_year = #{fiscalYear}
+		</where>
+	</select>
+    
+	<sql id="basSybCbzxRelColumns">
+		a.rel_id AS "relId",
+		a.cbzxdm AS "cbzxdm",
+		a.sybmc AS "sybmc",
+		a.fiscal_year AS "fiscalYear",
+		a.create_date AS "createDate",
+		a.remark AS "remark"
+	</sql>
+	
+	<sql id="basSybCbzxRelJoins">
+	</sql>
+    
+	<select id="get" resultType="BasSybCbzxRel">
+		SELECT 
+			<include refid="basSybCbzxRelColumns"/>
+		FROM bi.bas_syb_cbzx_rel a
+		<include refid="basSybCbzxRelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BasSybCbzxRel">
+		SELECT 
+			<include refid="basSybCbzxRelColumns"/>
+		FROM bi.bas_syb_cbzx_rel a
+		<include refid="basSybCbzxRelJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BasSybCbzxRel">
+		SELECT 
+			<include refid="basSybCbzxRelColumns"/>
+		FROM bi.bas_syb_cbzx_rel a
+		<include refid="basSybCbzxRelJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bi.bas_syb_cbzx_rel(
+			rel_id,
+			cbzxdm,
+			sybmc,
+			fiscal_year,
+			create_date,
+			remark
+		) VALUES (
+			#{relId},
+			#{cbzxdm},
+			#{sybmc},
+			#{fiscalYear},
+			#{createDate},
+			#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bi.bas_syb_cbzx_rel SET 	
+			rel_id = #{relId},
+			cbzxdm = #{cbzxdm},
+			sybmc = #{sybmc},
+			fiscal_year = #{fiscalYear},
+			remark = #{remark}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bi.bas_syb_cbzx_rel
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

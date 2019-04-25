@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.check.CstCheckSlaParaDao">
+    
+	<sql id="cstCheckSlaParaColumns">
+		a.id AS "id",
+		a.res_model_id AS "resModelId",
+		a.res_model_desc AS "resModelDesc",
+		a.sla_name AS "slaName",
+		a.line1_level1_scale AS "line1Level1Scale",
+		a.line1_level2_scale AS "line1Level2Scale",
+		a.line1_level3_scale AS "line1Level3Scale",
+		a.line1_level4_scale AS "line1Level4Scale",
+		a.line1_level5_scale AS "line1Level5Scale",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstCheckSlaParaParaColumns">
+		a.id AS "id",
+		a.res_model_id AS "resModelId",
+		a.res_model_desc AS "resModelDesc",
+		a.sla_name AS "slaName",
+		a.line1_level1_scale AS "line1Level1Scale",
+		a.line1_level2_scale AS "line1Level2Scale",
+		a.line1_level3_scale AS "line1Level3Scale",
+		a.line1_level4_scale AS "line1Level4Scale",
+		a.line1_level5_scale AS "line1Level5Scale",
+		a1.mfr_name AS "mfrName",
+		a1.equip_type_full_name AS "equipTypeName",
+		a.status AS "status"
+	</sql>
+	
+	<sql id="cstCheckSlaParaJoins">
+	</sql>
+	
+	<sql id="cstCheckSlaParaParaJoins">
+		LEFT JOIN 
+		(select t.modelgroup_id,d.mfr_name,b.equip_type_full_name 
+			from prod.t_res_resourcemodelgroup t, prod.t_res_manufactureinfo d, prod.t_res_resourceequiptype b
+			where t.mfr_id = d.mfr_id and  t.equip_type_id = b.equip_type_id ) a1
+		ON a1.modelgroup_id = a.res_model_id 
+	</sql>
+    
+	<select id="getBaseCheckSlaPara" resultType="CstCheckSlaPara">
+		SELECT 
+			<include refid="cstCheckSlaParaParaColumns"/>
+		FROM cst_check_sla_para a
+		<include refid="cstCheckSlaParaParaJoins"/>
+		WHERE a.status = 'A0'
+	</select>
+    
+	<select id="get" resultType="CstCheckSlaPara">
+		SELECT 
+			<include refid="cstCheckSlaParaColumns"/>
+		FROM cst_check_sla_para a
+		<include refid="cstCheckSlaParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="resModelId != null and resModelId != ''">
+				AND a.res_model_id = #{resModelId}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="slaName != null and slaName != ''">
+				AND a.sla_name = #{slaName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findList" resultType="CstCheckSlaPara">
+		SELECT 
+			<include refid="cstCheckSlaParaColumns"/>
+		FROM cst_check_sla_para a
+		<include refid="cstCheckSlaParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="resModelId != null and resModelId != ''">
+				AND a.res_model_id = #{resModelId}
+			</if>
+			<if test="resModelDesc != null and resModelDesc != ''">
+				AND a.res_model_desc = #{resModelDesc}
+			</if>
+			<if test="slaName != null and slaName != ''">
+				AND a.sla_name = #{slaName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstCheckSlaPara">
+		SELECT 
+			<include refid="cstCheckSlaParaColumns"/>
+		FROM cst_check_sla_para a
+		<include refid="cstCheckSlaParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_check_sla_para(
+			id,
+			res_model_id,
+			res_model_desc,
+			sla_name,
+			line1_level1_scale,
+			line1_level2_scale,
+			line1_level3_scale,
+			line1_level4_scale,
+			line1_level5_scale,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{resModelId},
+			#{resModelDesc},
+			#{slaName},
+			#{line1Level1Scale},
+			#{line1Level2Scale},
+			#{line1Level3Scale},
+			#{line1Level4Scale},
+			#{line1Level5Scale},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_check_sla_para SET 	
+			res_model_id = #{resModelId},
+			res_model_desc = #{resModelDesc},
+			sla_name = #{slaName},
+			line1_level1_scale = #{line1Level1Scale},
+			line1_level2_scale = #{line1Level2Scale},
+			line1_level3_scale = #{line1Level3Scale},
+			line1_level4_scale = #{line1Level4Scale},
+			line1_level5_scale = #{line1Level5Scale},
+			status = #{status},
+			remarks = #{remarks},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_check_sla_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

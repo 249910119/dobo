@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.model.MeasureDefDao">
+    
+	<sql id="measureDefColumns">
+		a.measure_Type_Id AS "measureTypeId",
+		a.measure_Id AS "measureId",
+		a.measure_Name AS "measureName",
+		a.measure_Desc AS "measureDesc",
+		a.measure_Type AS "measureType",
+		a.value_Type AS "valueType",
+		a.measure_Unit AS "measureUnit",
+		a.get_Type AS "getType",
+		a.measure_Formula AS "measureFormula",
+		a.calc_Class_Id AS "calcClassId",
+		a.modify_Staff AS "modifyStaff",
+		a.modify_Date AS "modifyDate",
+		a.remark AS "remark",
+		a.stat_Cycle AS "statCycle"
+	</sql>
+	
+	<sql id="measureDefJoins">
+	</sql>
+    
+	<select id="get" resultType="MeasureDef">
+		SELECT 
+			<include refid="measureDefColumns"/>
+		FROM prod.t_rul_measuredef a
+		<include refid="measureDefJoins"/>
+		WHERE a.measure_Id = #{measureId}
+	</select>
+	
+	<select id="findList" resultType="MeasureDef">
+		SELECT 
+			<include refid="measureDefColumns"/>
+		FROM prod.t_rul_measuredef a
+		<include refid="measureDefJoins"/>
+		<where>
+			<if test="measureId != null and measureId != ''">
+				AND a.measure_Id = #{measureId}
+			</if>
+			<if test="measureName != null and measureName != ''">
+				AND a.measure_Name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{measureName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{measureName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{measureName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.modify_Date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MeasureDef">
+		SELECT 
+			<include refid="measureDefColumns"/>
+		FROM prod.t_rul_measuredef a
+		<include refid="measureDefJoins"/>
+		<where>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.modify_Date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO prod.t_rul_measuredef(
+			measure_Type_Id,
+			measure_Id,
+			measure_Name,
+			measure_Desc,
+			measure_Type,
+			value_Type,
+			measure_Unit,
+			get_Type,
+			measure_Formula,
+			calc_Class_Id,
+			modify_Staff,
+			measure_Type,
+			modify_Date,
+			remark,
+			stat_Cycle
+		) VALUES (
+			#{measureTypeId},
+			#{measureId},
+			#{measureName},
+			#{measureDesc},
+			#{measureType},
+			#{valueType},
+			#{measureUnit},
+			#{getType},
+			#{measureFormula},
+			#{calcClassId},
+			#{modifyStaff},
+			#{modifyDate},
+			#{remark},
+			#{statCycle}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE prod.t_rul_measuredef SET 	
+			measure_Type_Id = #{measureTypeId},
+			measure_Id = #{measureId},
+			measure_Name = #{measureName},
+			measure_Desc = #{measureDesc},
+			measure_Type = #{measureType},
+			value_Type = #{valueType},
+			measure_Unit = #{measureUnit},
+			get_Type = #{getType},
+			measure_Formula = #{measureFormula},
+			calc_Class_Id = #{calcClassId},
+			modify_Staff = #{modifyStaff},
+			modify_Date = #{modifyDate},
+			remark = #{remark}
+			stat_Cycle = #{statCycle},
+		WHERE measureId = #{measureId}
+	</update>
+	
+	<update id="delete">
+		<!-- UPDATE prod.t_rul_measuredef SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} -->
+	</update>
+	
+</mapper>

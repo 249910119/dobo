@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cop.dao.detail.CopCaseDetailPriceDao">
+    
+	<sql id="copCaseDetailPriceColumns">
+		a.id AS "id",
+		a.case_detail_id AS "caseDetailId",
+		a.price_num AS "priceNum",
+		a.once_num AS "onceNum",
+		a.once_code AS "onceCode",
+		a.case_id AS "caseId",
+		a.case_code AS "caseCode",
+		a.price_type AS "priceType",
+		a.wbm_cost_prepay AS "wbmCostPrepay",
+		a.wbm_cost_prepay_travel AS "wbmCostPrepayTravel",
+		a.wbm_cost_ft AS "wbmCostFt",
+		a.wbm_cost_ft_travel AS "wbmCostFtTravel",
+		a.wbm_cost_ft_to_project AS "wbmCostFtToProject",
+		a.wbm_cost_ft_to_project_travel AS "wbmCostFtToProjectTravel",
+		a.audit_cost_prepay AS "auditCostPrepay",
+		a.audit_cost_prepay_travel AS "auditCostPrepayTravel",
+		a.audit_cost_ft AS "auditCostFt",
+		a.audit_cost_ft_travel AS "auditCostFtTravel",
+		a.audit_cost_ft_to_prj AS "auditCostFtToPrj",
+		a.audit_cost_ft_to_prj_travel AS "auditCostFtToPrjTravel",
+		a.pay_type AS "payType",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="copCaseDetailPriceJoins">
+	</sql>
+    
+	<select id="get" resultType="CopCaseDetailPrice">
+		SELECT 
+			<include refid="copCaseDetailPriceColumns"/>
+		FROM cop_case_detail_price a
+		<include refid="copCaseDetailPriceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CopCaseDetailPrice">
+		SELECT 
+			<include refid="copCaseDetailPriceColumns"/>
+		FROM cop_case_detail_price a
+		<include refid="copCaseDetailPriceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="onceNum != null and onceNum != ''">
+				AND a.once_num = #{onceNum}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getCasePriceBatch" resultType="CopCaseDetailPrice">
+		SELECT 
+			<include refid="copCaseDetailPriceColumns"/>
+		FROM cop_case_detail_price a
+		<include refid="copCaseDetailPriceJoins"/>
+		<where>
+			a.del_flag = '0'
+			<if test="onceCodes != null">
+				AND a.once_code in
+				<foreach collection="onceCodes" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+            	</foreach>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findAllList" resultType="CopCaseDetailPrice">
+		SELECT 
+			<include refid="copCaseDetailPriceColumns"/>
+		FROM cop_case_detail_price a
+		<include refid="copCaseDetailPriceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cop_case_detail_price(
+			id,
+			case_detail_id,
+			price_num,
+			once_num,
+			once_code,
+			case_id,
+			case_code,
+			price_type,
+			wbm_cost_prepay,
+			wbm_cost_prepay_travel,
+			wbm_cost_ft,
+			wbm_cost_ft_travel,
+			wbm_cost_ft_to_project,
+			wbm_cost_ft_to_project_travel,
+			audit_cost_prepay,
+			audit_cost_prepay_travel,
+			audit_cost_ft,
+			audit_cost_ft_travel,
+			audit_cost_ft_to_prj,
+			audit_cost_ft_to_prj_travel,
+			pay_type,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{caseDetailId},
+			#{priceNum},
+			#{onceNum},
+			#{onceCode},
+			#{caseId},
+			#{caseCode},
+			#{priceType},
+			#{wbmCostPrepay},
+			#{wbmCostPrepayTravel},
+			#{wbmCostFt},
+			#{wbmCostFtTravel},
+			#{wbmCostFtToProject},
+			#{wbmCostFtToProjectTravel},
+			#{auditCostPrepay},
+			#{auditCostPrepayTravel},
+			#{auditCostFt},
+			#{auditCostFtTravel},
+			#{auditCostFtToPrj},
+			#{auditCostFtToPrjTravel},
+			#{payType},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<insert id="addDetailBatch" parameterType="java.util.List">
+		INSERT INTO cop_case_detail_price(
+			id,
+			case_detail_id,
+			price_num,
+			once_num,
+			once_code,
+			case_id,
+			case_code,
+			price_type,
+			wbm_cost_prepay,
+			wbm_cost_prepay_travel,
+			wbm_cost_ft,
+			wbm_cost_ft_travel,
+			wbm_cost_ft_to_project,
+			wbm_cost_ft_to_project_travel,
+			audit_cost_prepay,
+			audit_cost_prepay_travel,
+			audit_cost_ft,
+			audit_cost_ft_travel,
+			audit_cost_ft_to_prj,
+			audit_cost_ft_to_prj_travel,
+			pay_type,
+			status,
+			create_by,
+			create_date,
+			pre_status,
+			status_change_date,
+			save_flag
+		) 
+		<foreach collection="list" item="item" index="index" separator="union all" >  
+		select 
+			#{item.id,jdbcType=VARCHAR} id,
+			#{item.caseDetailId,jdbcType=VARCHAR} caseDetailId,
+			#{item.priceNum,jdbcType=VARCHAR} priceNum,
+			#{item.onceNum,jdbcType=VARCHAR} onceNum,
+			#{item.onceCode,jdbcType=VARCHAR} onceCode,
+			#{item.caseId,jdbcType=VARCHAR} caseId,
+			#{item.caseCode,jdbcType=VARCHAR} caseCode,
+			#{item.priceType,jdbcType=VARCHAR} priceType,
+			#{item.wbmCostPrepay,jdbcType=DOUBLE} wbmCostPrepay,
+			#{item.wbmCostPrepayTravel,jdbcType=DOUBLE} wbmCostPrepayTravel,
+			#{item.wbmCostFt,jdbcType=DOUBLE} wbmCostFt,
+			#{item.wbmCostFtTravel,jdbcType=DOUBLE} wbmCostFtTravel,
+			#{item.wbmCostFtToProject,jdbcType=DOUBLE} wbmCostFtToProject,
+			#{item.wbmCostFtToProjectTravel,jdbcType=DOUBLE} wbmCostFtToProjectTravel,
+			#{item.auditCostPrepay,jdbcType=DOUBLE} auditCostPrepay,
+			#{item.auditCostPrepayTravel,jdbcType=DOUBLE} auditCostPrepayTravel,
+			#{item.auditCostFt,jdbcType=DOUBLE} auditCostFt,
+			#{item.auditCostFtTravel,jdbcType=DOUBLE} auditCostFtTravel,
+			#{item.auditCostFtToPrj,jdbcType=DOUBLE} auditCostFtToPrj,
+			#{item.auditCostFtToPrjTravel,jdbcType=DOUBLE} auditCostFtToPrjTravel,
+			#{item.payType,jdbcType=VARCHAR} payType,
+			#{item.status,jdbcType=VARCHAR} status,
+			'admin',
+			#{item.createDate,jdbcType=DATE} createDate,
+			#{item.preStatus,jdbcType=VARCHAR} preStatus,
+			#{item.statusChangeDate,jdbcType=DATE} statusChangeDate,
+			#{item.saveFlag,jdbcType=VARCHAR} saveFlag
+		from dual
+		</foreach>
+	</insert>
+	
+	<update id="update">
+		UPDATE cop_case_detail_price SET 	
+			case_detail_id = #{caseDetailId},
+			price_num = #{priceNum},
+			once_num = #{onceNum},
+			once_code = #{onceCode},
+			case_id = #{caseId},
+			case_code = #{caseCode},
+			price_type = #{priceType},
+			wbm_cost_prepay = #{wbmCostPrepay},
+			wbm_cost_prepay_travel = #{wbmCostPrepayTravel},
+			wbm_cost_ft = #{wbmCostFt},
+			wbm_cost_ft_travel = #{wbmCostFtTravel},
+			wbm_cost_ft_to_project = #{wbmCostFtToProject},
+			wbm_cost_ft_to_project_travel = #{wbmCostFtToProjectTravel},
+			audit_cost_prepay = #{auditCostPrepay},
+			audit_cost_prepay_travel = #{auditCostPrepayTravel},
+			audit_cost_ft = #{auditCostFt},
+			audit_cost_ft_travel = #{auditCostFtTravel},
+			audit_cost_ft_to_prj = #{auditCostFtToPrj},
+			audit_cost_ft_to_prj_travel = #{auditCostFtToPrjTravel},
+			pay_type = #{payType},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cop_case_detail_price SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

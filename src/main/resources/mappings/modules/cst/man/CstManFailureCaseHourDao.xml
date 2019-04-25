@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.man.CstManFailureCaseHourDao">
+    
+	<sql id="cstManFailureCaseHourColumns">
+		a.id AS "id",
+		a.resource_id AS "resourceId",
+		a.resource_desc AS "resourceDesc",
+		a.year_failure_rate AS "yearFailureRate",
+		a.line1_once_hour AS "line1OnceHour",
+		a.line2_once_hour AS "line2OnceHour",
+		a.line3_once_hour AS "line3OnceHour",
+		a.cmo_once_hour AS "cmoOnceHour",
+		a.res_mgr_once_hour AS "resMgrOnceHour",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.pre_status AS "preStatus"
+	</sql>
+	
+	<sql id="cstManFailureCaseHourJoins">
+	</sql>
+    
+	<select id="get" resultType="CstManFailureCaseHour">
+		SELECT 
+			<include refid="cstManFailureCaseHourColumns"/>
+		FROM cst_man_failure_case_hour a
+		<include refid="cstManFailureCaseHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="resourceId != null and resourceId != ''">
+				AND a.resource_id = #{resourceId}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findList" resultType="CstManFailureCaseHour">
+		SELECT 
+			<include refid="cstManFailureCaseHourColumns"/>
+		FROM cst_man_failure_case_hour a
+		<include refid="cstManFailureCaseHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="resourceId != null and resourceId != ''">
+				AND a.resource_id = #{resourceId}
+			</if>
+			<if test="resourceDesc != null and resourceDesc != ''">
+				AND a.resource_desc LIKE 
+					<if test="dbName == 'oracle'">'%'||#{resourceDesc}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{resourceDesc}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{resourceDesc},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstManFailureCaseHour">
+		SELECT 
+			<include refid="cstManFailureCaseHourColumns"/>
+		FROM cst_man_failure_case_hour a
+		<include refid="cstManFailureCaseHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_man_failure_case_hour(
+			id,
+			resource_id,
+			resource_desc,
+			year_failure_rate,
+			line1_once_hour,
+			line2_once_hour,
+			line3_once_hour,
+			cmo_once_hour,
+			res_mgr_once_hour,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			status_change_date,
+			save_flag,
+			pre_status
+		) VALUES (
+			#{id},
+			#{resourceId},
+			#{resourceDesc},
+			#{yearFailureRate},
+			#{line1OnceHour},
+			#{line2OnceHour},
+			#{line3OnceHour},
+			#{cmoOnceHour},
+			#{resMgrOnceHour},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{preStatus}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_man_failure_case_hour SET 	
+			resource_id = #{resourceId},
+			resource_desc = #{resourceDesc},
+			year_failure_rate = #{yearFailureRate},
+			line1_once_hour = #{line1OnceHour},
+			line2_once_hour = #{line2OnceHour},
+			line3_once_hour = #{line3OnceHour},
+			cmo_once_hour = #{cmoOnceHour},
+			res_mgr_once_hour = #{resMgrOnceHour},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_man_failure_case_hour SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

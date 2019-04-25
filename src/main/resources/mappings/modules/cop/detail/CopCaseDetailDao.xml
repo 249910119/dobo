@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cop.dao.detail.CopCaseDetailDao">
+    
+	<sql id="copCaseDetailColumns">
+		a.id AS "id",
+		a.price_num AS "priceNum",
+		a.once_num AS "onceNum",
+		a.once_code AS "onceCode",
+		a.case_id AS "caseId",
+		a.case_code AS "caseCode",
+		a.price_type AS "priceType",
+		a.service_type AS "serviceType",
+		a.dc_prj_id AS "dcPrjId",
+		a.dc_prj_name AS "dcPrjName",
+		a.service_content AS "serviceContent",
+		a.parts_info AS "partsInfo",
+		a.factory_id AS "factoryId",
+		a.factory_name AS "factoryName",
+		a.model_id AS "modelId",
+		a.model_name AS "modelName",
+		a.sn_id AS "snId",
+		a.man_role_id AS "manRoleId",
+		a.man_engineer_level AS "manEngineerLevel",
+		a.man_resource_type AS "manResourceType",
+		a.man_workload AS "manWorkload",
+		a.man_price AS "manPrice",
+		a.man_travel_price AS "manTravelPrice",
+		a.part_pn AS "partPn",
+		a.part_amount AS "partAmount",
+		a.part_price AS "partPrice",
+		a.part_delivery_price AS "partDeliveryPrice",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.is_special_audit AS "isSpecialAudit",
+		a.special_audit_remark AS "specialAuditRemark",
+		a.wo_project_code AS "woProjectCode",
+		a.wo_project_name AS "woProjectName",
+		a.wo_reason AS "woReason",
+		a.wo_approval_by AS "woApprovalBy",
+		a.wo_approval_date AS "woApprovalDate",
+		a.wo_approval_remark AS "woApprovalRemark",
+		a.invoke_type AS "invokeType"
+	</sql>
+	
+	<sql id="caseConfirmDetailColumns">
+		a.id AS "id",
+		a.price_num AS "priceNum",
+		a.once_num AS "onceNum",
+		a.once_code AS "onceCode",
+		a.case_id AS "caseId",
+		a.case_code AS "caseCode",
+		a.price_type AS "priceType",
+		a.service_type AS "serviceType",
+		b.dc_prj_id AS "dcPrjId",
+		a.dc_prj_name AS "dcPrjName",
+		a.service_content AS "serviceContent",
+		a.parts_info AS "partsInfo",
+		a.factory_id AS "factoryId",
+		a.factory_name AS "factoryName",
+		a.model_id AS "modelId",
+		a.model_name AS "modelName",
+		a.sn_id AS "snId",
+		a.man_role_id AS "manRoleId",
+		a.man_engineer_level AS "manEngineerLevel",
+		a.man_resource_type AS "manResourceType",
+		a.man_workload AS "manWorkload",
+		a.man_price AS "manPrice",
+		a.man_travel_price AS "manTravelPrice",
+		a.part_pn AS "partPn",
+		a.part_amount AS "partAmount",
+		a.part_price AS "partPrice",
+		a.part_delivery_price AS "partDeliveryPrice",
+		a.status AS "status",
+		a.invoke_type AS "invokeType",
+		b.pay_type AS "payType",
+		b.create_date AS "createDate",
+		b.pre_status AS "preStatus",
+		b.id AS "caseConfirmId"
+	</sql>
+	
+	<select id="getCaseConfirmList" resultType="CopCaseDetail">
+		SELECT 
+			<include refid="caseConfirmDetailColumns"/>
+		FROM cop_case_detail a,cop_case_price_confirm b
+		<where>
+			<![CDATA[ 
+				a.once_num = b.once_num 
+				AND b.status = 'A2' AND a.status = 'A0'
+				AND TO_CHAR(b.create_date, 'yyyyMMdd') <= #{createDateStr}
+			]]>
+			<if test="onceCode != null and onceCode != ''">
+				AND b.once_code = #{onceCode}
+			</if>
+		</where>
+			ORDER BY a.once_num DESC
+	</select>
+	
+	<sql id="copCaseDetailJoins">
+	</sql>
+    
+	<select id="get" resultType="CopCaseDetail">
+		SELECT 
+			<include refid="copCaseDetailColumns"/>
+		FROM cop_case_detail a
+		<include refid="copCaseDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getCaseBatch" resultType="CopCaseDetail">
+		SELECT 
+			<include refid="copCaseDetailColumns"/>
+		FROM cop_case_detail a
+		<include refid="copCaseDetailJoins"/>
+		<where>
+			a.del_flag = '0'
+			<if test="onceCodes != null">
+				AND a.once_code in
+				<foreach collection="onceCodes" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+            	</foreach>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findList" resultType="CopCaseDetail">
+		SELECT 
+			<include refid="copCaseDetailColumns"/>
+		FROM cop_case_detail a
+		<include refid="copCaseDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="onceNum != null and onceNum != ''">
+				AND a.once_num = #{onceNum}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CopCaseDetail">
+		SELECT 
+			<include refid="copCaseDetailColumns"/>
+		FROM cop_case_detail a
+		<include refid="copCaseDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cop_case_detail(
+			id,
+			price_num,
+			once_num,
+			once_code,
+			case_id,
+			case_code,
+			price_type,
+			service_type,
+			dc_prj_id,
+			dc_prj_name,
+			service_content,
+			parts_info,
+			factory_id,
+			factory_name,
+			model_id,
+			model_name,
+			sn_id,
+			man_role_id,
+			man_engineer_level,
+			man_resource_type,
+			man_workload,
+			man_price,
+			man_travel_price,
+			part_pn,
+			part_amount,
+			part_price,
+			part_delivery_price,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag,
+			is_special_audit,
+			special_audit_remark,
+			wo_project_code,
+			wo_project_name,
+			wo_reason,
+			wo_approval_by,
+			wo_approval_date,
+			wo_approval_remark,
+			invoke_type 
+		) VALUES (
+			#{id},
+			#{priceNum},
+			#{onceNum},
+			#{onceCode},
+			#{caseId},
+			#{caseCode},
+			#{priceType},
+			#{serviceType},
+			#{dcPrjId},
+			#{dcPrjName},
+			#{serviceContent},
+			#{partsInfo},
+			#{factoryId},
+			#{factoryName},
+			#{modelId},
+			#{modelName},
+			#{snId},
+			#{manRoleId},
+			#{manEngineerLevel},
+			#{manResourceType},
+			#{manWorkload},
+			#{manPrice},
+			#{manTravelPrice},
+			#{partPn},
+			#{partAmount},
+			#{partPrice},
+			#{partDeliveryPrice},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{isSpecialAudit},
+			#{specialAuditRemark},
+			#{woProjectCode},
+			#{woProjectName},
+			#{woReason},
+			#{woApprovalBy},
+			#{woApprovalDate},
+			#{woApprovalRemark},
+			#{invokeType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cop_case_detail SET 	
+			price_num = #{priceNum},
+			once_num = #{onceNum},
+			once_code = #{onceCode},
+			case_id = #{caseId},
+			case_code = #{caseCode},
+			price_type = #{priceType},
+			service_type = #{serviceType},
+			dc_prj_id = #{dcPrjId},
+			dc_prj_name = #{dcPrjName},
+			service_content = #{serviceContent},
+			parts_info = #{partsInfo},
+			factory_id = #{factoryId},
+			factory_name = #{factoryName},
+			model_id = #{modelId},
+			model_name = #{modelName},
+			sn_id = #{snId},
+			man_role_id = #{manRoleId},
+			man_engineer_level = #{manEngineerLevel},
+			man_resource_type = #{manResourceType},
+			man_workload = #{manWorkload},
+			man_price = #{manPrice},
+			man_travel_price = #{manTravelPrice},
+			part_pn = #{partPn},
+			part_amount = #{partAmount},
+			part_price = #{partPrice},
+			part_delivery_price = #{partDeliveryPrice},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag},
+			is_special_audit = #{isSpecialAudit},
+			special_audit_remark = #{specialAuditRemark},
+			wo_project_code = #{woProjectCode},
+			wo_project_name = #{woProjectName},
+			wo_reason = #{woReason},
+			wo_approval_by = #{woApprovalBy},
+			wo_approval_date = #{woApprovalDate},
+			wo_approval_remark = #{woApprovalRemark},
+			invoke_type = #{invokeType}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cop_case_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

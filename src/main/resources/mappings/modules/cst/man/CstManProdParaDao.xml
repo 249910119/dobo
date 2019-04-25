@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.man.CstManProdParaDao">
+    
+	<sql id="cstManProdParaColumns">
+		a.id AS "id",
+		a.prod_id AS "prodId",
+		a.prod_name AS "prodName",
+		a.cost_type AS "costType",
+		a.line2And3_mgr_scale AS "line2And3MgrScale",
+		a.cmo_mgr_scale AS "cmoMgrScale",
+		a.delivery_mgr_scale AS "deliveryMgrScale",
+		a.risk_mgr_scale AS "riskMgrScale",
+		a.product_line_mgr_scale as "productLineMgrScale",
+		a.qy_mgr_scale AS "qyMgrScale",
+		a.zk_mgr_scale AS "zkMgrScale",
+		a.mgr_scale AS "mgrScale",
+		a.tool_scale AS "toolScale",
+		a.risk_scale AS "riskScale",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarkId AS "remarkId",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstManProdParaJoins">
+	</sql>
+    
+	<select id="get" resultType="CstManProdPara">
+		SELECT 
+			<include refid="cstManProdParaColumns"/>
+		FROM cst_man_prod_para a
+		<include refid="cstManProdParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstManProdPara">
+		SELECT 
+			<include refid="cstManProdParaColumns"/>
+		FROM cst_man_prod_para a
+		<include refid="cstManProdParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="prodId != null and prodId != ''">
+				AND a.prod_id = #{prodId}
+			</if>
+			<if test="prodName != null and prodName != ''">
+				AND a.prod_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{prodName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{prodName}+'%'</if>
+					<if test="dbName == 'mysql'">CONCAT('%',#{prodName},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstManProdPara">
+		SELECT 
+			<include refid="cstManProdParaColumns"/>
+		FROM cst_man_prod_para a
+		<include refid="cstManProdParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_man_prod_para(
+			id,
+			prod_id,
+			prod_name,
+			qy_mgr_scale,
+			zk_mgr_scale,
+			mgr_scale,
+			tool_scale,
+			risk_scale,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarkId,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{prodId},
+			#{prodName},
+			#{qyMgrScale},
+			#{zkMgrScale},
+			#{mgrScale},
+			#{toolScale},
+			#{riskScale},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarkId},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_man_prod_para SET 	
+			prod_id = #{prodId},
+			prod_name = #{prodName},
+			qy_mgr_scale = #{qyMgrScale},
+			zk_mgr_scale = #{zkMgrScale},
+			mgr_scale = #{mgrScale},
+			tool_scale AS "toolScale",
+			risk_scale AS "riskScale",
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarkId = #{remarkId},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_man_prod_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

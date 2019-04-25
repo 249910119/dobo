@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.FcActualPayDetailDao">
+    
+    <select id="getMaxPayDate" resultType="date">
+		SELECT MAX(to_date(a.fkrq,'yyyyMMdd')) FROM bi.its_cgfk_fwsbu_bi a where a.fkrq is not null
+	</select>
+			
+	<!-- 计算月份为1月，项目范围：立项时间小于月初<1.1，计划收款时间小于等于月底<=1.31，实际到款时间小于等于月底<=1.31，且计划收款合计大于实际到款合计或者实际到款为0 -->
+	<select id="findListByActualPayTime" resultType="com.dobo.modules.fc.rest.entity.FcActualPayDetailRest">
+		SELECT 
+			'采购' AS "payType",b.XSYSYB AS "saleOrg",a.xqgzh AS "erpxmbh",b.TAX_TYPE AS "taxType",
+			to_date(a.FKRQ,'yyyyMMdd') AS "billStartDate",to_date(a.QZRQ,'yyyyMMdd') AS "billEndDate",NULL AS "exchangeType",
+			to_date(a.FKRQ,'yyyyMMdd') AS "payDate",a.FKJE AS "payMoney"
+		FROM bi.vw_its_cgfk_fwsbu_bi a, BI.VW_JCQT_HTLX_FWSBU_BI b
+		<where>
+			<![CDATA[
+				b.erpxmbh=a.xqgzh
+				and a.FKRQ IS NOT NULL and a.xqgzh IS NOT NULL and a.CGDDDM IS NOT NULL
+				and to_date(a.FKRQ,'yyyyMMdd') between to_date(#{planReceiptTimeB},'yyyyMMdd') and to_date(#{planReceiptTimeE},'yyyyMMdd')
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				and a.xqgzh = #{projectCode}
+			</if>
+		</where>
+		UNION ALL
+		SELECT 
+			'分包' AS "payType",c.XSYSYB AS "saleOrg",SUBSTR(b.DC_PRJ_ID,1,10) AS "erpxmbh",d.busin_Name AS "taxType",
+			null AS "billStartDate",null AS "billEndDate",null AS "exchangeType",
+			a.REAL_PAY_DATE AS "payDate",a.REAL_PAY_AMOUNT AS "payMoney"
+		FROM prod.t_sub_subprjpayplan a,prod.t_sub_subprojectinfo b 
+			LEFT JOIN BI.VW_JCQT_HTLX_FWSBU_BI c on c.erpxmbh=SUBSTR(b.DC_PRJ_ID,1,10)
+			LEFT JOIN pub.t_sys_dictionary d on d.busintype_id='TAXRATE' and d.busin_id=b.tax_rate
+		<where>
+			<![CDATA[
+				a.SUB_PRJ_ID=b.SUB_PRJ_ID and a.IS_PAY='A1' 
+			 	and a.REAL_PAY_DATE between to_date(#{planReceiptTimeB},'yyyyMMdd') and to_date(#{planReceiptTimeE},'yyyyMMdd')
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				and SUBSTR( b.DC_PRJ_ID, 1, 10 ) = #{projectCode}
+			</if>
+		</where>
+		UNION ALL	
+		SELECT 
+			'费用' AS "payType",null AS "saleOrg",a.CBZXDM AS "erpxmbh",'' AS "taxType",
+			null AS "billStartDate",null AS "billEndDate",null AS "exchangeType",
+			to_date(a.PZJZRQ,'yyyyMMdd') AS "payDate",a.LRZXBWBJE AS "payMoney"
+		FROM bi.vw_its_fymx_fwsbu_bi a
+		<where>
+			<![CDATA[
+				to_date(a.PZJZRQ, 'yyyyMMdd') between to_date(#{planReceiptTimeB},'yyyyMMdd') and to_date(#{planReceiptTimeE},'yyyyMMdd')
+			]]>
+		</where>
+	</select>
+			
+	<!-- 项目维度（不含费用） 计算月份为1月，项目范围：立项时间小于月初<1.1，计划收款时间小于等于月底<=1.31，实际到款时间小于等于月底<=1.31，且计划收款合计大于实际到款合计或者实际到款为0 -->
+	<select id="findListByPlanReceiptTime" resultType="com.dobo.modules.fc.rest.entity.FcActualPayDetailRest">
+		SELECT 
+			'采购' AS "payType",b.XSYSYB AS "saleOrg",a.xqgzh AS "erpxmbh",b.TAX_TYPE AS "taxType",
+			to_date(a.FKRQ,'yyyyMMdd') AS "billStartDate",to_date(a.QZRQ,'yyyyMMdd') AS "billEndDate",NULL AS "exchangeType",
+			to_date(a.FKRQ,'yyyyMMdd') AS "payDate",a.FKJE AS "payMoney"
+		FROM bi.vw_its_cgfk_fwsbu_bi a, BI.VW_JCQT_HTLX_FWSBU_BI b
+		<where>
+			<![CDATA[
+				b.erpxmbh=a.xqgzh
+				and a.FKRQ IS NOT NULL and a.xqgzh IS NOT NULL and a.CGDDDM IS NOT NULL
+				and a.xqgzh not in (select c2.project_code from dobo.fc_project_info_nocalc c2 where c2.status='A0')
+				and a.FKRQ < #{planReceiptTimeE}
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				and a.xqgzh = #{projectCode}
+			</if>
+			<if test="fstSvcTypeName != null and fstSvcTypeName != ''">
+				AND b.FST_SVC_TYPE = #{fstSvcTypeName}
+			</if>
+		</where>
+		UNION ALL
+		SELECT 
+			'分包' AS "payType",c.XSYSYB AS "saleOrg",SUBSTR(b.DC_PRJ_ID,1,10) AS "erpxmbh",d.busin_Name AS "taxType",
+			null AS "billStartDate",null AS "billEndDate",null AS "exchangeType",
+			a.REAL_PAY_DATE AS "payDate",a.REAL_PAY_AMOUNT AS "payMoney"
+		FROM prod.t_sub_subprjpayplan a,prod.t_sub_subprojectinfo b 
+			LEFT JOIN BI.VW_JCQT_HTLX_FWSBU_BI c on c.erpxmbh=SUBSTR(b.DC_PRJ_ID,1,10)
+			LEFT JOIN pub.t_sys_dictionary d on d.busintype_id='TAXRATE' and d.busin_id=b.tax_rate
+		<where>
+			<![CDATA[
+				a.SUB_PRJ_ID=b.SUB_PRJ_ID and a.IS_PAY='A1'
+				
+				and SUBSTR(b.DC_PRJ_ID,1,10)  not in (select c2.project_code from dobo.fc_project_info_nocalc c2 where c2.status='A0')
+				
+				and a.REAL_PAY_DATE < to_date(#{planReceiptTimeE},'yyyyMMdd')
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				and SUBSTR( b.DC_PRJ_ID, 1, 10 ) = #{projectCode}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 项目维度（不含费用） 计算月份为1月，项目范围：立项时间小于月初<1.1，计划收款时间小于等于月底<=1.31，实际到款时间小于等于月底<=1.31，且计划收款合计大于实际到款合计或者实际到款为0 -->
+	<select id="findListByActualPayReceiptTime" resultType="com.dobo.modules.fc.rest.entity.FcActualPayDetailRest">
+		SELECT 
+			'采购' AS "payType",b.XSYSYB AS "saleOrg",a.xqgzh AS "erpxmbh",b.TAX_TYPE AS "taxType",
+			to_date(a.FKRQ,'yyyyMMdd') AS "billStartDate",to_date(a.QZRQ,'yyyyMMdd') AS "billEndDate",NULL AS "exchangeType",
+			to_date(a.FKRQ,'yyyyMMdd') AS "payDate",a.FKJE AS "payMoney"
+		FROM bi.vw_its_cgfk_fwsbu_bi a, BI.VW_JCQT_HTLX_FWSBU_BI b
+		<where>
+			<![CDATA[
+				b.erpxmbh=a.xqgzh
+				and a.FKRQ IS NOT NULL and a.xqgzh IS NOT NULL and a.CGDDDM IS NOT NULL
+				and a.xqgzh not in (select c2.project_code from dobo.fc_project_info_nocalc c2 where c2.status='A0')
+				and a.FKRQ < #{planReceiptTimeE}
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				and a.xqgzh = #{projectCode}
+			</if>
+			<if test="fstSvcTypeName != null and fstSvcTypeName != ''">
+				AND b.FST_SVC_TYPE = #{fstSvcTypeName}
+			</if>
+		</where>
+		UNION ALL
+		SELECT 
+			'分包' AS "payType",c.XSYSYB AS "saleOrg",SUBSTR(b.DC_PRJ_ID,1,10) AS "erpxmbh",d.busin_Name AS "taxType",
+			null AS "billStartDate",null AS "billEndDate",null AS "exchangeType",
+			a.REAL_PAY_DATE AS "payDate",a.REAL_PAY_AMOUNT AS "payMoney"
+		FROM prod.t_sub_subprjpayplan a,prod.t_sub_subprojectinfo b 
+			LEFT JOIN BI.VW_JCQT_HTLX_FWSBU_BI c on c.erpxmbh=SUBSTR(b.DC_PRJ_ID,1,10)
+			LEFT JOIN pub.t_sys_dictionary d on d.busintype_id='TAXRATE' and d.busin_id=b.tax_rate
+		<where>
+			<![CDATA[
+				a.SUB_PRJ_ID=b.SUB_PRJ_ID and a.IS_PAY='A1'
+				
+				and SUBSTR(b.DC_PRJ_ID,1,10)  not in (select c2.project_code from dobo.fc_project_info_nocalc c2 where c2.status='A0')
+				
+				and a.REAL_PAY_DATE < to_date(#{planReceiptTimeE},'yyyyMMdd')
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				and SUBSTR( b.DC_PRJ_ID, 1, 10 ) = #{projectCode}
+			</if>
+		</where>
+		UNION ALL	
+		SELECT 
+			a.PAY_TYPE AS "payType",a.SALE_ORG AS "saleOrg",SUBSTR(a.DC_PRJ_ID,1,10) AS "erpxmbh",a.TAX_TYPE AS "taxType",
+			null AS "billStartDate",null AS "billEndDate",null AS "exchangeType",
+			to_date(a.PAY_DATE,'yyyyMMdd') AS "payDate",a.PAY_MONEY AS "payMoney"
+		FROM dobo.FC_PRJ_FEE_INFO a
+		<where>
+			<![CDATA[
+				a.PAY_DATE < to_date(#{planReceiptTimeE},'yyyyMMdd')
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				and SUBSTR( a.DC_PRJ_ID, 1, 10 ) = #{projectCode}
+			</if>
+		</where>
+	</select>
+    
+    
+	<sql id="fcActualPayDetailColumns">
+		a.fk_id AS "fkId",
+		a.cgdddm AS "cgdddm",
+		a.xmdm AS "xmdm",
+		a.gysdm AS "gysdm",
+		a.gysmc AS "gysmc",
+		a.gsdm AS "gsdm",
+		a.sbumc AS "sbumc",
+		a.bumc AS "bumc",
+		a.sybmc AS "sybmc",
+		a.ywfwdm AS "ywfwdm",
+		a.ywfwmc AS "ywfwmc",
+		a.fkpzdm AS "fkpzdm",
+		a.fkje AS "fkje",
+		a.fkrq AS "fkrq",
+		a.pays AS "pays",
+		a.invsdate AS "invsdate",
+		a.invedate AS "invedate",
+		a.formid AS "formid",
+		a.create_date AS "createDate",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<sql id="fcActualPayDetailJoins">
+	</sql>
+    
+	<select id="get" resultType="FcActualPayDetail">
+		SELECT 
+			<include refid="fcActualPayDetailColumns"/>
+		FROM bi.its_cgfk_fwsbu_bi a
+		<include refid="fcActualPayDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FcActualPayDetail">
+		SELECT 
+			<include refid="fcActualPayDetailColumns"/>
+		FROM bi.its_cgfk_fwsbu_bi a
+		<include refid="fcActualPayDetailJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FcActualPayDetail">
+		SELECT 
+			<include refid="fcActualPayDetailColumns"/>
+		FROM bi.its_cgfk_fwsbu_bi a
+		<include refid="fcActualPayDetailJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bi.its_cgfk_fwsbu_bi(
+			fk_id,
+			cgdddm,
+			xmdm,
+			gysdm,
+			gysmc,
+			gsdm,
+			sbumc,
+			bumc,
+			sybmc,
+			ywfwdm,
+			ywfwmc,
+			fkpzdm,
+			fkje,
+			fkrq,
+			pays,
+			invsdate,
+			invedate,
+			formid,
+			create_date,
+			remarks
+		) VALUES (
+			#{fkId},
+			#{cgdddm},
+			#{xmdm},
+			#{gysdm},
+			#{gysmc},
+			#{gsdm},
+			#{sbumc},
+			#{bumc},
+			#{sybmc},
+			#{ywfwdm},
+			#{ywfwmc},
+			#{fkpzdm},
+			#{fkje},
+			#{fkrq},
+			#{pays},
+			#{invsdate},
+			#{invedate},
+			#{formid},
+			#{createDate},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bi.its_cgfk_fwsbu_bi SET 	
+			fk_id = #{fkId},
+			cgdddm = #{cgdddm},
+			xmdm = #{xmdm},
+			gysdm = #{gysdm},
+			gysmc = #{gysmc},
+			gsdm = #{gsdm},
+			sbumc = #{sbumc},
+			bumc = #{bumc},
+			sybmc = #{sybmc},
+			ywfwdm = #{ywfwdm},
+			ywfwmc = #{ywfwmc},
+			fkpzdm = #{fkpzdm},
+			fkje = #{fkje},
+			fkrq = #{fkrq},
+			pays = #{pays},
+			invsdate = #{invsdate},
+			invedate = #{invedate},
+			formid = #{formid},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bi.its_cgfk_fwsbu_bi
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

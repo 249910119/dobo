@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.base.CstBaseBackCaseParaDao">
+    
+	<sql id="cstBaseBackCaseParaColumns">
+		a.detail_id AS "detailId",
+		a.resstattype_name AS "resstattypeName",
+		a.resource_desc AS "resourceDesc",
+		a.level1_case_rate AS "level1CaseRate",
+		a.level2_case_rate AS "level2CaseRate",
+		a.level3_case_rate AS "level3CaseRate",
+		a.level4_case_rate AS "level4CaseRate",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstBaseBackCaseParaJoins">
+	</sql>
+    
+	<select id="get" resultType="CstBaseBackCasePara">
+		SELECT 
+			<include refid="cstBaseBackCaseParaColumns"/>
+		FROM cst_base_back_case_para a
+		<include refid="cstBaseBackCaseParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstBaseBackCasePara">
+		SELECT 
+			<include refid="cstBaseBackCaseParaColumns"/>
+		FROM cst_base_back_case_para a
+		<include refid="cstBaseBackCaseParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstBaseBackCasePara">
+		SELECT 
+			<include refid="cstBaseBackCaseParaColumns"/>
+		FROM cst_base_back_case_para a
+		<include refid="cstBaseBackCaseParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_base_back_case_para(
+			detail_id,
+			resstattype_name,
+			resource_desc,
+			level1_case_rate,
+			level2_case_rate,
+			level3_case_rate,
+			level4_case_rate,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{detailId},
+			#{resstattypeName},
+			#{resourceDesc},
+			#{level1CaseRate},
+			#{level2CaseRate},
+			#{level3CaseRate},
+			#{level4CaseRate},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_base_back_case_para SET 	
+			detail_id = #{detailId},
+			resstattype_name = #{resstattypeName},
+			resource_desc = #{resourceDesc},
+			level1_case_rate = #{level1CaseRate},
+			level2_case_rate = #{level2CaseRate},
+			level3_case_rate = #{level3CaseRate},
+			level4_case_rate = #{level4CaseRate},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_base_back_case_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

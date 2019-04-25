@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.parts.CstPartsRiskCostParaDao">
+    
+	<sql id="cstPartsRiskCostParaColumns">
+		a.id AS "id",
+		a.modelgroup_id AS "modelgroupId",
+		a.modelgroup_desc AS "modelgroupDesc",
+		a.historical_amount AS "historicalAmount",
+		a.risk_cost_scale AS "riskCostScale",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstPartsRiskCostParaJoins">
+	</sql>
+    
+	<select id="get" resultType="CstPartsRiskCostPara">
+		SELECT 
+			<include refid="cstPartsRiskCostParaColumns"/>
+		FROM cst_parts_risk_cost_para a
+		<include refid="cstPartsRiskCostParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstPartsRiskCostPara">
+		SELECT 
+			<include refid="cstPartsRiskCostParaColumns"/>
+		FROM cst_parts_risk_cost_para a
+		<include refid="cstPartsRiskCostParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstPartsRiskCostPara">
+		SELECT 
+			<include refid="cstPartsRiskCostParaColumns"/>
+		FROM cst_parts_risk_cost_para a
+		<include refid="cstPartsRiskCostParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_parts_risk_cost_para(
+			id,
+			modelgroup_id,
+			modelgroup_desc,
+			historical_amount,
+			risk_cost_scale,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{modelgroupId},
+			#{modelgroupDesc},
+			#{historicalAmount},
+			#{riskCostScale},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_parts_risk_cost_para SET 	
+			modelgroup_id = #{modelgroupId},
+			modelgroup_desc = #{modelgroupDesc},
+			historical_amount = #{historicalAmount},
+			risk_cost_scale = #{riskCostScale},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_parts_risk_cost_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

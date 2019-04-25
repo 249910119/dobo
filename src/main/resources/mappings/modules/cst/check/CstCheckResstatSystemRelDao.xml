@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.check.CstCheckResstatSystemRelDao">
+    
+	<sql id="cstCheckResstatSystemRelColumns">
+		a.id AS "id",
+		a.resstattype_name AS "resstattypeName",
+		a.system_name AS "systemName",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.resstattype_id AS "resstattypeId",
+		a.system_id AS "systemId",
+		a.desc_type_name AS "descTypeName"
+	</sql>
+	
+	<sql id="cstCheckResstatSystemRelJoins">
+	</sql>
+    
+	<select id="get" resultType="CstCheckResstatSystemRel">
+		SELECT 
+			<include refid="cstCheckResstatSystemRelColumns"/>
+		FROM cst_check_resstat_system_rel a
+		<include refid="cstCheckResstatSystemRelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstCheckResstatSystemRel">
+		SELECT 
+			<include refid="cstCheckResstatSystemRelColumns"/>
+		FROM cst_check_resstat_system_rel a
+		<include refid="cstCheckResstatSystemRelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="resstattypeName != null and resstattypeName != ''">
+				AND a.resstattype_name = #{resstattypeName}
+			</if>
+			<if test="systemName != null and systemName != ''">
+				AND a.system_name = #{systemName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="resstattypeId != null and resstattypeId != ''">
+				AND a.resstattype_id = #{resstattypeId}
+			</if>
+			<if test="systemId != null and systemId != ''">
+				AND a.system_id = #{systemId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstCheckResstatSystemRel">
+		SELECT 
+			<include refid="cstCheckResstatSystemRelColumns"/>
+		FROM cst_check_resstat_system_rel a
+		<include refid="cstCheckResstatSystemRelJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_check_resstat_system_rel(
+			id,
+			resstattype_name,
+			system_name,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag,
+			resstattype_id,
+			system_id,
+			desc_type_name
+		) VALUES (
+			#{id},
+			#{resstattypeName},
+			#{systemName},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{resstattypeId},
+			#{systemId},
+			#{descTypeName}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_check_resstat_system_rel SET 	
+			resstattype_name = #{resstattypeName},
+			system_name = #{systemName},
+			status = #{status},
+			remarks = #{remarks},
+			save_flag = #{saveFlag},
+			resstattype_id = #{resstattypeId},
+			system_id = #{systemId},
+			desc_type_name = #{descTypeName}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_check_resstat_system_rel SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.BasSybInitialDao">
+	
+	<select id="findListByFiscalYear" resultType="BasSybInitial">
+		SELECT 
+			<include refid="basSybInitialColumns"/>
+		FROM bi.bas_syb_initial a
+		<where>
+			a.fiscal_year = #{fiscalYear}
+		</where>
+	</select>
+    
+	<sql id="basSybInitialColumns">
+		a.rel_id AS "relId",
+		a.sybmc AS "sybmc",
+		a.initial_loans AS "initialLoans",
+		a.pay_profit AS "payProfit",
+		a.load_limit AS "loadLimit",
+		a.fiscal_year AS "fiscalYear",
+		a.create_date AS "createDate",
+		a.remark AS "remark"
+	</sql>
+	
+	<sql id="basSybInitialJoins">
+	</sql>
+    
+	<select id="get" resultType="BasSybInitial">
+		SELECT 
+			<include refid="basSybInitialColumns"/>
+		FROM bi.bas_syb_initial a
+		<include refid="basSybInitialJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BasSybInitial">
+		SELECT 
+			<include refid="basSybInitialColumns"/>
+		FROM bi.bas_syb_initial a
+		<include refid="basSybInitialJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BasSybInitial">
+		SELECT 
+			<include refid="basSybInitialColumns"/>
+		FROM bi.bas_syb_initial a
+		<include refid="basSybInitialJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bi.bas_syb_initial(
+			rel_id,
+			sybmc,
+			initial_loans,
+			pay_profit,
+			load_limit,
+			fiscal_year,
+			create_date,
+			remark
+		) VALUES (
+			#{relId},
+			#{sybmc},
+			#{initialLoans},
+			#{payProfit},
+			#{loadLimit},
+			#{fiscalYear},
+			#{createDate},
+			#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bi.bas_syb_initial SET 	
+			rel_id = #{relId},
+			sybmc = #{sybmc},
+			initial_loans = #{initialLoans},
+			pay_profit = #{payProfit},
+			load_limit = #{loadLimit},
+			fiscal_year = #{fiscalYear},
+			remark = #{remark}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bi.bas_syb_initial
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.check.CstCheckDistanceUnitHourDao">
+    
+	<sql id="cstCheckDistanceUnitHourColumns">
+		a.id AS "id",
+		a.sla_name AS "slaName",
+		a.system_name AS "systemName",
+		a.unit_distance_hour AS "unitDistanceHour",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.system_id AS "systemId"
+	</sql>
+	
+	<sql id="cstCheckDistanceUnitHourJoins">
+	</sql>
+    
+	<select id="get" resultType="CstCheckDistanceUnitHour">
+		SELECT 
+			<include refid="cstCheckDistanceUnitHourColumns"/>
+		FROM cst_check_distance_unit_hour a
+		<include refid="cstCheckDistanceUnitHourJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstCheckDistanceUnitHour">
+		SELECT 
+			<include refid="cstCheckDistanceUnitHourColumns"/>
+		FROM cst_check_distance_unit_hour a
+		<include refid="cstCheckDistanceUnitHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="slaName != null and slaName != ''">
+				AND a.sla_name = #{slaName}
+			</if>
+			<if test="systemName != null and systemName != ''">
+				AND a.system_name = #{systemName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="systemId != null and systemId != ''">
+				AND a.system_id = #{systemId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstCheckDistanceUnitHour">
+		SELECT 
+			<include refid="cstCheckDistanceUnitHourColumns"/>
+		FROM cst_check_distance_unit_hour a
+		<include refid="cstCheckDistanceUnitHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_check_distance_unit_hour(
+			id,
+			sla_name,
+			system_name,
+			unit_distance_hour,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag,
+			system_id
+		) VALUES (
+			#{id},
+			#{slaName},
+			#{systemName},
+			#{unitDistanceHour},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{systemId}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_check_distance_unit_hour SET 	
+			sla_name = #{slaName},
+			system_name = #{systemName},
+			unit_distance_hour = #{unitDistanceHour},
+			status = #{status},
+			remarks = #{remarks},
+			save_flag = #{saveFlag},
+			system_id = #{systemId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_check_distance_unit_hour SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

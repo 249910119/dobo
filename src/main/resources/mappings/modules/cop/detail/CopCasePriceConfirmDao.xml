@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cop.dao.detail.CopCasePriceConfirmDao">
+    
+	<sql id="copCasePriceConfirmColumns">
+		a.id AS "id",
+		a.dc_prj_id AS "dcPrjId",
+		a.dc_prj_name AS "dcPrjName",
+		a.sales_id AS "salesId",
+		a.sales_name AS "salesName",
+		a.once_num AS "onceNum",
+		a.once_code AS "onceCode",
+		a.case_id AS "caseId",
+		a.case_code AS "caseCode",
+		a.price_type AS "priceType",
+		a.service_type AS "serviceType",
+		a.pay_type AS "payType",
+		a.cost_prepay AS "costPrepay",
+		a.cost_prepay_travel AS "costPrepayTravel",
+		a.case_desc AS "caseDesc",
+		a.pre_pay_info AS "prePayInfo",
+		a.area_name AS "areaName",
+		a.province AS "province",
+		a.city_id AS "cityId",
+		a.city_name AS "cityName",
+		a.share_no AS "shareNo",
+		a.res_base_org AS "resBaseOrg",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.resstattype_name AS "resstattypeName",
+		a.change_prepay_date AS "changePrepayDate"
+	</sql>
+	
+	<sql id="copCasePriceConfirmJoins">
+	</sql>
+    
+	<select id="get" resultType="CopCasePriceConfirm">
+		SELECT 
+			<include refid="copCasePriceConfirmColumns"/>
+		FROM cop_case_price_confirm a
+		<include refid="copCasePriceConfirmJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CopCasePriceConfirm">
+		SELECT 
+			<include refid="copCasePriceConfirmColumns"/>
+		FROM cop_case_price_confirm a
+		<include refid="copCasePriceConfirmJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="onceNum != null and onceNum != ''">
+				AND a.once_num = #{onceNum}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CopCasePriceConfirm">
+		SELECT 
+			<include refid="copCasePriceConfirmColumns"/>
+		FROM cop_case_price_confirm a
+		<include refid="copCasePriceConfirmJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getExecareaBatch" resultType="java.lang.String" parameterType="java.lang.String">
+		SELECT c.areatype_name FROM prod.t_bim_areacityrel a,prod.t_bim_areatype c,prod.t_bim_regioninfo d 
+		WHERE a.areatype_id=c.areatype_id AND c.areaclass_id='EXECAREA' AND d.region_id=a.region_id
+		AND d.region_name = #{abc}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cop_case_price_confirm(
+			id,
+			dc_prj_id,
+			dc_prj_name,
+			sales_id,
+			sales_name,
+			once_num,
+			once_code,
+			case_id,
+			case_code,
+			price_type,
+			service_type,
+			pay_type,
+			cost_prepay,
+			cost_prepay_travel,
+			case_desc,
+			pre_pay_info,
+			area_name,
+			province,
+			city_id,
+			city_name,
+			share_no,
+			res_base_org,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag,
+			resstattype_name,
+		    change_prepay_date
+		) VALUES (
+			#{id},
+			#{dcPrjId},
+			#{dcPrjName},
+			#{salesId},
+			#{salesName},
+			#{onceNum},
+			#{onceCode},
+			#{caseId},
+			#{caseCode},
+			#{priceType},
+			#{serviceType},
+			#{payType},
+			#{costPrepay},
+			#{costPrepayTravel},
+			#{caseDesc},
+			#{prePayInfo},
+			#{areaName},
+			#{province},
+			#{cityId},
+			#{cityName},
+			#{shareNo},
+			#{resBaseOrg},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{resstattypeName},
+			#{changePrepayDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cop_case_price_confirm SET 	
+			dc_prj_id = #{dcPrjId},
+			dc_prj_name = #{dcPrjName},
+			sales_id = #{salesId},
+			sales_name = #{salesName},
+			once_num = #{onceNum},
+			once_code = #{onceCode},
+			case_id = #{caseId},
+			case_code = #{caseCode},
+			price_type = #{priceType},
+			service_type = #{serviceType},
+			pay_type = #{payType},
+			cost_prepay = #{costPrepay},
+			cost_prepay_travel = #{costPrepayTravel},
+			case_desc = #{caseDesc},
+			pre_pay_info = #{prePayInfo},
+			area_name = #{areaName},
+			province = #{province},
+			city_id = #{cityId},
+			city_name = #{cityName},
+			share_no = #{shareNo},
+			res_base_org = #{resBaseOrg},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag},
+			resstattype_name = #{resstattypeName},
+		    change_prepay_date = #{changePrepayDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cop_case_price_confirm SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

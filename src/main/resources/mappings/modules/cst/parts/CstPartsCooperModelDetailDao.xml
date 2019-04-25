@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.parts.CstPartsCooperModelDetailDao">
+    
+	<sql id="cstPartsCooperModelDetailColumns">
+		a.id AS "id",
+		a.resource_id AS "resourceId",
+		a.resource_desc AS "resourceDesc",
+		a.pack_id AS "packId",
+		a.is_cooper AS "isCooper",
+		a.is_high_end AS "isHighEnd",
+		a.date_id AS "dateId",
+		a.begin_date AS "beginDate",
+		a.end_date AS "endDate",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstPartsCooperModelDetailJoins">
+	</sql>
+    
+	<select id="get" resultType="CstPartsCooperModelDetail">
+		SELECT 
+			<include refid="cstPartsCooperModelDetailColumns"/>
+		FROM cst_parts_cooper_model_detail a
+		<include refid="cstPartsCooperModelDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstPartsCooperModelDetail">
+		SELECT 
+			<include refid="cstPartsCooperModelDetailColumns"/>
+		FROM cst_parts_cooper_model_detail a
+		<include refid="cstPartsCooperModelDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstPartsCooperModelDetail">
+		SELECT 
+			<include refid="cstPartsCooperModelDetailColumns"/>
+		FROM cst_parts_cooper_model_detail a
+		<include refid="cstPartsCooperModelDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_parts_cooper_model_detail(
+			id,
+			resource_id,
+			resource_desc,
+			pack_id,
+			is_cooper,
+			is_high_end,
+			date_id,
+			begin_date,
+			end_date,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{resourceId},
+			#{resourceDesc},
+			#{packId},
+			#{isCooper},
+			#{isHighEnd},
+			#{dateId},
+			#{beginDate},
+			#{endDate},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_parts_cooper_model_detail SET 	
+			resource_id = #{resourceId},
+			resource_desc = #{resourceDesc},
+			pack_id = #{packId},
+			is_cooper = #{isCooper},
+			is_high_end = #{isHighEnd},
+			date_id = #{dateId},
+			begin_date = #{beginDate},
+			end_date = #{endDate},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_parts_cooper_model_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

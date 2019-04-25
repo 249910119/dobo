@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.man.CstManManageDegreeParaDao">
+    
+	<sql id="cstManManageDegreeParaColumns">
+		a.id AS "id",
+		a.prod_id AS "prodId",
+		a.prod_name AS "prodName",
+		a.service_level AS "serviceLevel",
+		a.service_level_name AS "serviceLevelName",
+		a.pm_level3_scale AS "pmLevel3Scale",
+		a.pm_level4_scale AS "pmLevel4Scale",
+		a.pm_level5_scale AS "pmLevel5Scale",
+		a.pm_degree AS "pmDegree",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstManManageDegreeParaJoins">
+	</sql>
+    
+	<select id="get" resultType="CstManManageDegreePara">
+		SELECT 
+			<include refid="cstManManageDegreeParaColumns"/>
+		FROM cst_man_manage_degree_para a
+		<include refid="cstManManageDegreeParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstManManageDegreePara">
+		SELECT 
+			<include refid="cstManManageDegreeParaColumns"/>
+		FROM cst_man_manage_degree_para a
+		<include refid="cstManManageDegreeParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="prodId != null and prodId != ''">
+				AND a.prod_id = #{prodId}
+			</if>
+			<if test="prodName != null and prodName != ''">
+				AND a.prod_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{prodName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{prodName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{prodName},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstManManageDegreePara">
+		SELECT 
+			<include refid="cstManManageDegreeParaColumns"/>
+		FROM cst_man_manage_degree_para a
+		<include refid="cstManManageDegreeParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_man_manage_degree_para(
+			id,
+			prod_id,
+			prod_name,
+			service_level,
+			service_level_name,
+			pm_level3_scale,
+			pm_level4_scale,
+			pm_level5_scale,
+			pm_degree,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{prodId},
+			#{prodName},
+			#{serviceLevel},
+			#{serviceLevelName},
+			#{pmLevel3Scale},
+			#{pmLevel4Scale},
+			#{pmLevel5Scale},
+			#{pmDegree},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_man_manage_degree_para SET 	
+			prod_id = #{prodId},
+			prod_name = #{prodName},
+			service_level = #{serviceLevel},
+			service_level_name = #{serviceLevelName},
+			pm_level3_scale = #{pmLevel3Scale},
+			pm_level4_scale = #{pmLevel4Scale},
+			pm_level5_scale = #{pmLevel5Scale},
+			pm_degree = #{pmDegree},
+			status = #{status},
+			remarks = #{remarks},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_man_manage_degree_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.detail.CstNewOrderCostInfoDao">
+    
+	<sql id="cstNewOrderCostInfoColumns">
+		a.id AS "id",
+		a.dc_prj_id AS "dcPrjId",
+		a.prod_id AS "prodId",
+		a.pd_id AS "pdId",
+		a.key_id AS "keyId",
+		a.man_line1level1 AS "manLine1level1",
+		a.man_line1level2 AS "manLine1level2",
+		a.man_line1level3 AS "manLine1level3",
+		a.man_line1level4 AS "manLine1level4",
+		a.man_line1level5 AS "manLine1level5",
+		a.man_line1level6 AS "manLine1level6",
+		a.man_out_fee AS "manOutFee",
+		a.man_pm3 AS "manPm3",
+		a.man_pm4 AS "manPm4",
+		a.man_pm5 AS "manPm5",
+		a.man_line2expert AS "manLine2expert",
+		a.man_cmo AS "manCmo",
+		a.man_delivery AS "manDelivery",
+		a.man_risk AS "manRisk",
+		a.man_prodline AS "manProdline",
+		a.bak_gzcb_zy AS "bakGzcbZy",
+		a.bak_gzcb_fb AS "bakGzcbFb",
+		a.bak_bjrg AS "bakBjrg",
+		a.bak_xmcbcb AS "bakXmcbcb",
+		a.bak_gpcbcb AS "bakGpcbcb",
+		a.bak_ckzlcb AS "bakCkzlcb",
+		a.bak_bccb AS "bakBccb",
+		a.bak_hsqjyscb AS "bakHsqjyscb",
+		a.bak_gzjfhyscb AS "bakGzjfhyscb",
+		a.bak_wysdcb AS "bakWysdcb",
+		a.bak_dbyscb AS "bakDbyscb",
+		a.bak_fxcbj AS "bakFxcbj",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.mfr_name AS "mfrName",
+		a.resource_name AS "resourceName",
+		a.modelgroup_name AS "modelgroupName",
+		a.equip_type_name AS "equipTypeName",
+		a.resource_id AS "resourceId",
+		a.begin_date AS "beginDate",
+		a.end_date AS "endDate",
+		a.order_id AS "orderId"
+	</sql>
+	
+	<sql id="cstNewOrderCostInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="CstNewOrderCostInfo">
+		SELECT 
+			<include refid="cstNewOrderCostInfoColumns"/>
+		FROM cst_new_order_cost_info a
+		<include refid="cstNewOrderCostInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstNewOrderCostInfo">
+		SELECT 
+			<include refid="cstNewOrderCostInfoColumns"/>
+		FROM cst_new_order_cost_info a
+		<include refid="cstNewOrderCostInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstNewOrderCostInfo">
+		SELECT 
+			<include refid="cstNewOrderCostInfoColumns"/>
+		FROM cst_new_order_cost_info a
+		<include refid="cstNewOrderCostInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="addDetailBatch" parameterType="java.util.List">
+		INSERT INTO cst_new_order_cost_info(
+			id,
+			dc_prj_id,
+			prod_id,
+			pd_id,
+			key_id,
+			man_line1level1,
+			man_line1level2,
+			man_line1level3,
+			man_line1level4,
+			man_line1level5,
+			man_line1level6,
+			man_out_fee,
+			man_pm3,
+			man_pm4,
+			man_pm5,
+			man_line2expert,
+			man_cmo,
+			man_delivery,
+			man_risk,
+			man_prodline,
+			bak_gzcb_zy,
+			bak_gzcb_fb,
+			bak_bjrg,
+			bak_xmcbcb,
+			bak_gpcbcb,
+			bak_ckzlcb,
+			bak_bccb,
+			bak_hsqjyscb,
+			bak_gzjfhyscb,
+			bak_wysdcb,
+			bak_dbyscb,
+			bak_fxcbj,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			mfr_name,
+			resource_name,
+			modelgroup_name,
+			equip_type_name,
+			resource_id,
+			begin_date,
+			end_date,
+			order_id,
+			prod_name
+		) 
+		<foreach collection="list" item="item" index="index" separator="union all" >  
+		select 
+			#{item.id,jdbcType=VARCHAR} id,
+			#{item.dcPrjId,jdbcType=VARCHAR} dc_prj_id,
+			#{item.prodId,jdbcType=VARCHAR} prod_id,
+			#{item.pdId,jdbcType=VARCHAR} pd_id,
+			#{item.keyId,jdbcType=VARCHAR} key_id,
+			#{item.manLine1level1,jdbcType=DOUBLE} man_line1level1,
+			#{item.manLine1level2,jdbcType=DOUBLE} man_line1level2,
+			#{item.manLine1level3,jdbcType=DOUBLE} man_line1level3,
+			#{item.manLine1level4,jdbcType=DOUBLE} man_line1level4,
+			#{item.manLine1level5,jdbcType=DOUBLE} man_line1level5,
+			#{item.manLine1level6,jdbcType=DOUBLE} man_line1level6,
+			#{item.manOutFee,jdbcType=DOUBLE} man_out_fee,
+			#{item.manPm3,jdbcType=DOUBLE} man_pm3,
+			#{item.manPm4,jdbcType=DOUBLE} man_pm4,
+			#{item.manPm5,jdbcType=DOUBLE} man_pm5,
+			#{item.manLine2expert,jdbcType=DOUBLE} man_line2expert,
+			#{item.manCmo,jdbcType=DOUBLE} man_cmo,
+			#{item.manDelivery,jdbcType=DOUBLE} man_delivery,
+			#{item.manRisk,jdbcType=DOUBLE} man_risk,
+			#{item.manProdline,jdbcType=DOUBLE} man_prodline,
+			#{item.bakGzcbZy,jdbcType=DOUBLE} bak_gzcb_zy,
+			#{item.bakGzcbFb,jdbcType=DOUBLE} bak_gzcb_fb,
+			#{item.bakBjrg,jdbcType=DOUBLE} bak_bjrg,
+			#{item.bakXmcbcb,jdbcType=DOUBLE} bak_xmcbcb,
+			#{item.bakGpcbcb,jdbcType=DOUBLE} bak_gpcbcb,
+			#{item.bakCkzlcb,jdbcType=DOUBLE} bak_ckzlcb,
+			#{item.bakBccb,jdbcType=DOUBLE} bak_bccb,
+			#{item.bakHsqjyscb,jdbcType=DOUBLE} bak_hsqjyscb,
+			#{item.bakGzjfhyscb,jdbcType=DOUBLE} bak_gzjfhyscb,
+			#{item.bakWysdcb,jdbcType=DOUBLE} bak_wysdcb,
+			#{item.bakDbyscb,jdbcType=DOUBLE} bak_dbyscb,
+			#{item.bakFxcbj,jdbcType=DOUBLE} bak_fxcbj,
+			#{item.status,jdbcType=VARCHAR} status,
+			#{item.createBy.id,jdbcType=VARCHAR} create_by,
+			#{item.createDate,jdbcType=DATE} create_date,
+			#{item.updateBy.id,jdbcType=VARCHAR} update_by,
+			#{item.updateDate,jdbcType=DATE} update_date,
+			#{item.remarks,jdbcType=VARCHAR} remarks,
+			#{item.delFlag,jdbcType=CHAR} del_flag,
+			#{item.mfrName,jdbcType=VARCHAR} mfr_name,
+			#{item.resourceName,jdbcType=VARCHAR} resource_name,
+			#{item.modelgroupName,jdbcType=VARCHAR} modelgroup_name,
+			#{item.equipTypeName,jdbcType=VARCHAR} equip_type_name,
+			#{item.resourceId,jdbcType=VARCHAR} resource_id,
+			#{item.beginDate,jdbcType=DATE} begin_date,
+			#{item.endDate,jdbcType=DATE} end_date,
+			#{item.orderId,jdbcType=VARCHAR} order_id,
+			#{item.prodName,jdbcType=VARCHAR} prod_name
+		from dual
+		</foreach>
+	</insert>
+	
+	<insert id="insert">
+		INSERT INTO cst_new_order_cost_info(
+			id,
+			dc_prj_id,
+			prod_id,
+			pd_id,
+			key_id,
+			man_line1level1,
+			man_line1level2,
+			man_line1level3,
+			man_line1level4,
+			man_line1level5,
+			man_line1level6,
+			man_out_fee,
+			man_pm3,
+			man_pm4,
+			man_pm5,
+			man_line2expert,
+			man_cmo,
+			man_delivery,
+			man_risk,
+			man_prodline,
+			bak_gzcb_zy,
+			bak_gzcb_fb,
+			bak_bjrg,
+			bak_xmcbcb,
+			bak_gpcbcb,
+			bak_ckzlcb,
+			bak_bccb,
+			bak_hsqjyscb,
+			bak_gzjfhyscb,
+			bak_wysdcb,
+			bak_dbyscb,
+			bak_fxcbj,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			mfr_name,
+			resource_name,
+			modelgroup_name,
+			equip_type_name,
+			resource_id,
+			begin_date,
+			end_date,
+			order_id
+		) VALUES (
+			#{id},
+			#{dcPrjId},
+			#{prodId},
+			#{pdId},
+			#{keyId},
+			#{manLine1level1},
+			#{manLine1level2},
+			#{manLine1level3},
+			#{manLine1level4},
+			#{manLine1level5},
+			#{manLine1level6},
+			#{manOutFee},
+			#{manPm3},
+			#{manPm4},
+			#{manPm5},
+			#{manLine2expert},
+			#{manCmo},
+			#{manDelivery},
+			#{manRisk},
+			#{manProdline},
+			#{bakGzcbZy},
+			#{bakGzcbFb},
+			#{bakBjrg},
+			#{bakXmcbcb},
+			#{bakGpcbcb},
+			#{bakCkzlcb},
+			#{bakBccb},
+			#{bakHsqjyscb},
+			#{bakGzjfhyscb},
+			#{bakWysdcb},
+			#{bakDbyscb},
+			#{bakFxcbj},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{mfrName},
+			#{resourceName},
+			#{modelgroupName},
+			#{equipTypeName},
+			#{resourceId},
+			#{beginDate},
+			#{endDate},
+			#{orderId}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_new_order_cost_info SET 	
+			dc_prj_id = #{dcPrjId},
+			prod_id = #{prodId},
+			pd_id = #{pdId},
+			key_id = #{keyId},
+			man_line1level1 = #{manLine1level1},
+			man_line1level2 = #{manLine1level2},
+			man_line1level3 = #{manLine1level3},
+			man_line1level4 = #{manLine1level4},
+			man_line1level5 = #{manLine1level5},
+			man_line1level6 = #{manLine1level6},
+			man_out_fee = #{manOutFee},
+			man_pm3 = #{manPm3},
+			man_pm4 = #{manPm4},
+			man_pm5 = #{manPm5},
+			man_line2expert = #{manLine2expert},
+			man_cmo = #{manCmo},
+			man_delivery = #{manDelivery},
+			man_risk = #{manRisk},
+			man_prodline = #{manProdline},
+			bak_gzcb_zy = #{bakGzcbZy},
+			bak_gzcb_fb = #{bakGzcbFb},
+			bak_bjrg = #{bakBjrg},
+			bak_xmcbcb = #{bakXmcbcb},
+			bak_gpcbcb = #{bakGpcbcb},
+			bak_ckzlcb = #{bakCkzlcb},
+			bak_bccb = #{bakBccb},
+			bak_hsqjyscb = #{bakHsqjyscb},
+			bak_gzjfhyscb = #{bakGzjfhyscb},
+			bak_wysdcb = #{bakWysdcb},
+			bak_dbyscb = #{bakDbyscb},
+			bak_fxcbj = #{bakFxcbj},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			mfr_name = #{mfrName},
+			resource_name = #{resourceName},
+			modelgroup_name = #{modelgroupName},
+			equip_type_name = #{equipTypeName},
+			resource_id = #{resourceId},
+			begin_date = #{beginDate},
+			end_date = #{endDate},
+			order_id = #{orderId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_new_order_cost_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

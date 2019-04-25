@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.model.CostTypeDao">
+    
+	<sql id="costTypeColumns">
+		a.cost_Type AS "costType",
+		a.type_Name AS "typeName",
+		a.modify_Staff AS "modifyStaff",
+		a.modify_Date AS "modifyDate",
+		a.remark AS "remark",
+		a.cost_Field AS "costField"
+	</sql>
+	
+	<sql id="costTypeJoins">
+	</sql>
+    
+	<select id="get" resultType="CostType">
+		SELECT 
+			<include refid="costTypeColumns"/>
+		FROM prod.t_rul_costtype a
+		<include refid="costTypeJoins"/>
+		WHERE a.costType = #{costType}
+	</select>
+	
+	<select id="findList" resultType="CostType">
+		SELECT 
+			<include refid="costTypeColumns"/>
+		FROM prod.t_rul_costtype a
+		<include refid="costTypeJoins"/>
+		<where>
+			<if test="costType != null and costType != ''">
+				AND a.cost_Type = #{costType}
+			</if>
+			<if test="typeName != null and typeName != ''">
+				AND a.type_Name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{typeName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{typeName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{typeName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.modify_Date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CostType">
+		SELECT 
+			<include refid="costTypeColumns"/>
+		FROM prod.t_rul_costtype a
+		<include refid="costTypeJoins"/>
+		<where>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.modify_Date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO prod.t_rul_costtype(
+			cost_Type,
+			type_Name,
+			modify_Staff,
+			modify_Date,
+			remark,
+			cost_Field
+		) VALUES (
+			#{costType},
+			#{typeName},
+			#{modifyStaff},
+			#{modifyDate},
+			#{remark},
+			#{costField}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE prod.t_rul_cost_type SET 	
+			cost_Type = #{costType},
+			type_Name = #{typeName},
+			modify_Staff = #{modifyStaff},
+			modify_Date = #{modifyDate},
+			remark = #{remark},
+			cost_Field = #{costField}
+		WHERE costType = #{costType}
+	</update>
+	
+	<update id="delete">
+		<!-- UPDATE prod.t_rul_cost_type SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} -->
+	</update>
+	
+</mapper>

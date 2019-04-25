@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.man.CstManFailureDegreeDao">
+    
+	<sql id="cstManFailureDegreeColumns">
+		a.id AS "id",
+		a.sla_name AS "slaName",
+		a.sla_id AS "slaId",
+		a.line1_degree AS "line1Degree",
+		a.line2_degree AS "line2Degree",
+		a.line3_degree AS "line3Degree",
+		a.cmo_degree AS "cmoDegree",
+		a.res_mgr_degree AS "resMgrDegree",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstManFailureDegreeJoins">
+	</sql>
+    
+	<select id="get" resultType="CstManFailureDegree">
+		SELECT 
+			<include refid="cstManFailureDegreeColumns"/>
+		FROM cst_man_failure_degree a
+		<include refid="cstManFailureDegreeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstManFailureDegree">
+		SELECT 
+			<include refid="cstManFailureDegreeColumns"/>
+		FROM cst_man_failure_degree a
+		<include refid="cstManFailureDegreeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="slaName != null and slaName != ''">
+				AND a.sla_name = #{slaName}
+			</if>
+			<if test="slaId != null and slaId != ''">
+				AND a.sla_id = #{slaId}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstManFailureDegree">
+		SELECT 
+			<include refid="cstManFailureDegreeColumns"/>
+		FROM cst_man_failure_degree a
+		<include refid="cstManFailureDegreeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_man_failure_degree(
+			id,
+			sla_name,
+			sla_id,
+			line1_degree,
+			line2_degree,
+			line3_degree,
+			cmo_degree,
+			res_mgr_degree,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{slaName},
+			#{slaId},
+			#{line1Degree},
+			#{line2Degree},
+			#{line3Degree},
+			#{cmoDegree},
+			#{resMgrDegree},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_man_failure_degree SET 	
+			sla_name = #{slaName},
+			sla_id = #{slaId},
+			line1_degree = #{line1Degree},
+			line2_degree = #{line2Degree},
+			line3_degree = #{line3Degree},
+			cmo_degree = #{cmoDegree},
+			res_mgr_degree = #{resMgrDegree},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_man_failure_degree SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

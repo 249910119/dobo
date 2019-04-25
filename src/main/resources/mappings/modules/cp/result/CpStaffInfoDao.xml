@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cp.dao.result.CpStaffInfoDao">
+    
+	<sql id="cpStaffInfoColumns">
+		a.id AS "id",
+		a.staff_id AS "staffId",
+		a.staff_name AS "staffName",
+		a.org_name AS "orgName",
+		a.full_org_name AS "fullOrgName",
+		a.remark1 AS "remark1",
+		a.remark2 AS "remark2",
+		a.remark3 AS "remark3",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cpStaffInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="CpStaffInfo">
+		SELECT 
+			<include refid="cpStaffInfoColumns"/>
+		FROM cp_staff_info a
+		<include refid="cpStaffInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CpStaffInfo">
+		SELECT 
+			<include refid="cpStaffInfoColumns"/>
+		FROM cp_staff_info a
+		<include refid="cpStaffInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CpStaffInfo">
+		SELECT 
+			<include refid="cpStaffInfoColumns"/>
+		FROM cp_staff_info a
+		<include refid="cpStaffInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cp_staff_info(
+			id,
+			staff_id,
+			staff_name,
+			org_name,
+			full_org_name,
+			remark1,
+			remark2,
+			remark3,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{staffId},
+			#{staffName},
+			#{orgName},
+			#{fullOrgName},
+			#{remark1},
+			#{remark2},
+			#{remark3},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cp_staff_info SET 	
+			staff_id = #{staffId},
+			staff_name = #{staffName},
+			org_name = #{orgName},
+			full_org_name = #{fullOrgName},
+			remark1 = #{remark1},
+			remark2 = #{remark2},
+			remark3 = #{remark3},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cp_staff_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

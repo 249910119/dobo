@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.man.CstManCityParaDao">
+    
+	<sql id="cstManCityParaColumns">
+		a.id AS "id",
+		a.province AS "province",
+		a.city_name AS "cityName",
+		a.city_id AS "cityId",
+		a.capital_city_id AS "capitalCityId",
+		a.capital_city_name AS "capitalCityName",
+		a.city_hour AS "cityHour",
+		a.travel_hour AS "travelHour",
+		a.travel_fee AS "travelFee",
+		a.stand_accm_fee AS "standAccmFee",
+		a.fault_area_scale AS "faultAreaScale",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstManCityParaJoins">
+		LEFT JOIN sys_area a2 ON a2.id = a.city_name
+		LEFT JOIN sys_area a5 ON a5.id = a.capital_city_name
+		LEFT JOIN sys_user u10 ON u10.id = a.create_by
+		LEFT JOIN sys_user u12 ON u12.id = a.update_by
+	</sql>
+    
+	<select id="get" resultType="CstManCityPara">
+		SELECT 
+			<include refid="cstManCityParaColumns"/>
+		FROM cst_man_city_para a
+		<include refid="cstManCityParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstManCityPara">
+		SELECT 
+			<include refid="cstManCityParaColumns"/>
+		FROM cst_man_city_para a
+		<include refid="cstManCityParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="cityName != null and cityName != ''">
+				AND a.city_name = #{cityName}
+			</if>
+			<if test="capitalCityName != null and capitalCityName != ''">
+				AND a.capital_city_name = #{capitalCityName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstManCityPara">
+		SELECT 
+			<include refid="cstManCityParaColumns"/>
+		FROM cst_man_city_para a
+		<include refid="cstManCityParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_man_city_para(
+			id,
+			city_name,
+			city_id,
+			capital_city_id,
+			capital_city_name,
+			city_hour,
+			travel_hour,
+			travel_fee,
+			stand_accm_fee,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag,
+			province,
+			fault_area_scale
+		) VALUES (
+			#{id},
+			#{cityName},
+			#{cityId},
+			#{capitalCityId},
+			#{capitalCityName},
+			#{cityHour},
+			#{travelHour},
+			#{travelFee},
+			#{standAccmFee},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{province},
+			#{faultAreaScale}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_man_city_para SET 	
+			city_name = #{cityName},
+			city_id = #{cityId},
+			capital_city_id = #{capitalCityId},
+			capital_city_name = #{capitalCityName},
+			city_hour = #{cityHour},
+			travel_hour = #{travelHour},
+			travel_fee = #{travelFee},
+			stand_accm_fee = #{standAccmFee},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag},
+			province = #{province},
+			fault_area_scale = #{faultAreaScale}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_man_city_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

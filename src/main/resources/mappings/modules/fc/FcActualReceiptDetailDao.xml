@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.FcActualReceiptDetailDao">
+	
+	<select id="findListByActual" resultType="com.dobo.modules.fc.rest.entity.FcActualReceiptDetailRest">
+		SELECT 
+			b.XSYSYB AS "saleOrg",b.ERPXMBH,b.TAX_TYPE AS "taxType",to_date(c.DKRQ,'yyyyMMdd') AS "receiptDate",c.DKJE AS "receiptMoney"
+		FROM bi.VW_ITS_SKYH_FWSBU_BI c, BI.VW_JCQT_HTLX_FWSBU_BI b
+		<where>
+			<![CDATA[
+				b.erpxmbh=a.xmh
+				and to_date(c.DKRQ,'yyyyMMdd') between to_date(#{planReceiptTimeB},'yyyyMMdd') and to_date(#{planReceiptTimeE},'yyyyMMdd')
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				and c.ERPXMBH = #{projectCode}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 计算月份为1月，项目范围：立项时间小于月初<1.1，计划收款时间小于等于月底<=1.31，实际到款时间小于等于月底<=1.31，且计划收款合计大于实际到款合计或者实际到款为0 -->
+	<select id="findListByPlanReceiptTime" resultType="com.dobo.modules.fc.rest.entity.FcActualReceiptDetailRest">
+		SELECT 
+		    b.XSYSYB AS "saleOrg",b.ERPXMBH,b.TAX_TYPE AS "taxType",to_date(c.DKRQ,'yyyyMMdd') AS "receiptDate",c.DKJE AS "receiptMoney",'A0' AS "payType" 
+		FROM bi.VW_ITS_SKYH_FWSBU_BI c,BI.VW_JCQT_HTLX_FWSBU_BI b
+		<where>
+			<![CDATA[
+				(b.QY_WBQYJE>0 OR b.QY_NBSRJE>0) AND b.htlxspjsrq >= '20120101' AND SUBSTR(b.ERPXMBH,1,1) != 'R' AND SUBSTR(b.ERPXMBH,2,2) != 'YX'
+				and b.erpxmbh=c.xmh
+				and b.erpxmbh not in (select c2.project_code from dobo.fc_project_info_nocalc c2 where c2.status='A0')
+			]]>
+			<!-- <if test='notAllReceived == "" or notAllReceived == "Y"'>
+				<![CDATA[
+				and b.ERPXMBH IN (
+					SELECT g.ERPXMBH FROM (
+				        SELECT g1.ERPXMBH,SUM(g1.PLAN_GATHER_MONEY_NUM) AS PLAN_GATHER_MONEY_NUM 
+				        FROM bi.VW_GATHER_MONEY_PLAN_CRM g1
+				        WHERE g1.PLAN_GATHER_MONEY_DATE < to_date(#{planReceiptTimeE},'yyyyMMdd')
+				        GROUP BY g1.ERPXMBH 
+					) g ,
+				    (SELECT h1.XMH,SUM(H1.DKJE) AS DKJE 
+				    	FROM BI.VW_ITS_SKYH_FWSBU_BI h1
+					    WHERE h1.DKRQ < #{planReceiptTimeE} 
+					    GROUP BY h1.XMH
+				    ) H
+				    WHERE g.ERPXMBH=h.XMH and g.PLAN_GATHER_MONEY_NUM > h.DKJE
+				    UNION ALL
+				    SELECT g1.ERPXMBH FROM bi.VW_GATHER_MONEY_PLAN_CRM g1
+				    WHERE g1.PLAN_GATHER_MONEY_DATE < to_date(#{planReceiptTimeE},'yyyyMMdd')
+				    and NOT EXISTS (
+				        SELECT 1 FROM BI.VW_ITS_SKYH_FWSBU_BI h1 WHERE h1.XMH = g1.ERPXMBH and h1.DKRQ < #{planReceiptTimeE}
+				    )
+				)
+				]]>
+			</if> -->
+			<if test="projectCode != null and projectCode != ''">
+				and b.ERPXMBH = #{projectCode}
+			</if>
+			<if test="fstSvcTypeName != null and fstSvcTypeName != ''">
+				AND b.FST_SVC_TYPE = #{fstSvcTypeName}
+			</if>
+		</where>
+	</select>
+
+	<!-- 计算月份为1月，项目范围：1.1=<立项时间在1月期间<=1.31 -->
+	<select id="findListByHtlxrq" resultType="com.dobo.modules.fc.rest.entity.FcActualReceiptDetailRest">
+		SELECT 
+			c.xmh AS "projectCode",0 AS "displayOrder",to_date(C.DKRQ,'yyyyMMdd') AS "receiptDate",
+		    c.DKJE AS "receiptMoney",'A0' AS "payType" 
+		FROM bi.VW_ITS_SKYH_FWSBU_BI c,BI.VW_JCQT_HTLX_FWSBU_BI b
+		<where>
+			<![CDATA[ 
+			 	b.erpxmbh=c.xmh
+			 	and b.htlxspjsrq >= '20120101' and SUBSTR(b.ERPXMBH,1,1) != 'R' and SUBSTR(b.ERPXMBH,2,2) != 'YX'
+			 	and b.htlxspjsrq >= #{htlxspjsrqB} and b.htlxspjsrq <= #{htlxspjsrqE} 
+			 ]]>
+			<if test="projectCode != null and projectCode != ''">
+				and b.ERPXMBH = #{projectCode}
+			</if>
+		</where>
+	</select>
+    
+	<sql id="fcActualReceiptDetailColumns">
+		a.id AS "id",
+		a.fc_project_info_id AS "fcProjectInfoId",
+		a.display_order AS "displayOrder",
+		a.actual_receipt_time AS "receiptDate",
+		a.actual_receipt_amount AS "receiptMoney",
+		a.pay_type AS "payType",
+		a.pay_currency AS "payCurrency",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a1.id AS "fcProjectInfo.id",
+		a1.project_code AS "fcProjectInfo.projectCode",
+		a1.project_name AS "fcProjectInfo.projectName"
+	</sql>
+	
+	<sql id="fcActualReceiptDetailJoins">
+		LEFT JOIN fc_project_info a1 ON a1.id = a.fc_project_info_id
+	</sql>
+    
+	<select id="get" resultType="FcActualReceiptDetail">
+		SELECT 
+			<include refid="fcActualReceiptDetailColumns"/>
+		FROM fc_actual_receipt_detail a
+		<include refid="fcActualReceiptDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FcActualReceiptDetail">
+		SELECT 
+			<include refid="fcActualReceiptDetailColumns"/>
+		FROM fc_actual_receipt_detail a
+		<include refid="fcActualReceiptDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="fcProjectInfoId != null and fcProjectInfoId != ''">
+				and a.fc_project_info_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{fcProjectInfoId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{fcProjectInfoId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{fcProjectInfoId},'%')</if>
+			</if>
+			<if test="actualReceiptTime != null and actualReceiptTime != ''">
+				<![CDATA[ and TO_CHAR(a.actual_receipt_time, 'yyyyMMdd') <= TO_CHAR(#{actualReceiptTime}, 'yyyyMMdd') ]]>
+			</if>
+			<if test="actualReceiptAmount != null and actualReceiptAmount != ''">
+				and a.actual_receipt_amount = #{actualReceiptAmount}
+			</if>
+			<if test="status != null and status != ''">
+				and a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FcActualReceiptDetail">
+		SELECT 
+			<include refid="fcActualReceiptDetailColumns"/>
+		FROM fc_actual_receipt_detail a
+		<include refid="fcActualReceiptDetailJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO fc_actual_receipt_detail(
+			id,
+			fc_project_info_id,
+			display_order,
+			actual_receipt_time,
+			actual_receipt_amount,
+			pay_type,
+			pay_currency,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{fcProjectInfoId},
+			#{displayOrder},
+			#{actualReceiptTime},
+			#{actualReceiptAmount},
+			#{payType},
+			#{payCurrency},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE fc_actual_receipt_detail SET 	
+			fc_project_info_id = #{fcProjectInfoId},
+			display_order = #{displayOrder},
+			actual_receipt_time = #{actualReceiptTime},
+			actual_receipt_amount = #{actualReceiptAmount},
+			pay_type = #{payType},
+			pay_currency = #{payCurrency},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			status = #{status},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE fc_actual_receipt_detail SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.detail.CstDetailCostInfoDao">
+    
+	<sql id="cstDetailCostInfoColumns">
+		a.id AS "id",
+		a.detail_id AS "detailId",
+		a.key_id AS "keyId",
+		a.res_plan AS "resPlan",
+		a.man_cost AS "manCost",
+		a.fee_cost AS "feeCost",
+		a.urge_cost AS "urgeCost",
+		a.travl_fee AS "travlFee",
+		a.base_fee AS "baseFee",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.prod_id AS "prodId",
+		a.dc_prj_id AS "dcPrjId"
+	</sql>
+	
+	<sql id="cstDetailCostInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="CstDetailCostInfo">
+		SELECT 
+			<include refid="cstDetailCostInfoColumns"/>
+		FROM cst_detail_cost_info a
+		<include refid="cstDetailCostInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstDetailCostInfo">
+		SELECT 
+			<include refid="cstDetailCostInfoColumns"/>
+		FROM cst_detail_cost_info a
+		<include refid="cstDetailCostInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="detailId != null and detailId != ''">
+				AND a.detail_id = #{detailId}
+			</if>
+			<if test="keyId != null and keyId != ''">
+				AND a.key_id = #{keyId}
+			</if>
+			<if test="prodId != null and prodId != ''">
+				AND a.prod_id = #{prodId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstDetailCostInfo">
+		SELECT 
+			<include refid="cstDetailCostInfoColumns"/>
+		FROM cst_detail_cost_info a
+		<include refid="cstDetailCostInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_detail_cost_info(
+			id,
+			detail_id,
+			key_id,
+			res_plan,
+			man_cost,
+			fee_cost,
+			urge_cost,
+			travl_fee,
+			base_fee,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			prod_id,
+			dc_prj_id
+		) VALUES (
+			#{id},
+			#{detailId},
+			#{keyId},
+			#{resPlan},
+			#{manCost},
+			#{feeCost},
+			#{urgeCost},
+			#{travlFee},
+			#{baseFee},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{prodId},
+			#{dcPrjId}
+		)
+	</insert>
+	
+	<insert id="addDetailBatch" parameterType="java.util.List">
+		INSERT INTO cst_detail_cost_info(
+			id,
+			detail_id,
+			key_id,
+			res_plan,
+			man_cost,
+			fee_cost,
+			urge_cost,
+			travl_fee,
+			base_fee,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			prod_id,
+			dc_prj_id
+		) 
+		<foreach collection="list" item="item" index="index" separator="union all" >  
+		select 
+			#{item.id,jdbcType=VARCHAR} id,
+			#{item.detailId,jdbcType=VARCHAR} detail_id,
+			#{item.keyId,jdbcType=VARCHAR} key_id,
+			#{item.resPlan,jdbcType=DOUBLE} res_plan,
+			#{item.manCost,jdbcType=DOUBLE} man_cost,
+			#{item.feeCost,jdbcType=DOUBLE} fee_cost,
+			#{item.urgeCost,jdbcType=DOUBLE} urge_cost,
+			#{item.travlFee,jdbcType=DOUBLE} travl_cost,
+			#{item.baseFee,jdbcType=DOUBLE} base_cost,
+			#{item.status,jdbcType=VARCHAR} status,
+			#{item.createBy.id,jdbcType=VARCHAR} create_by,
+			#{item.createDate,jdbcType=DATE} create_date,
+			#{item.updateBy.id,jdbcType=VARCHAR} update_by,
+			#{item.updateDate,jdbcType=DATE} update_date,
+			#{item.remarks,jdbcType=VARCHAR} remarks,
+			#{item.delFlag,jdbcType=CHAR} del_flag,
+			#{item.prodId,jdbcType=VARCHAR} prod_id,
+			#{item.dcPrjId,jdbcType=VARCHAR} dc_prj_id
+		from dual
+		</foreach>
+	</insert>
+	
+	<!-- sql 批量
+	<insert id="addDetailBatch" parameterType="java.util.List">
+		INSERT INTO cst_detail_cost_info(
+			id,
+			detail_id,
+			key_id,
+			res_plan,
+			man_cost,
+			fee_cost,
+			urge_cost,
+			travl_fee,
+			base_fee,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			prod_id,
+			dc_prj_id
+		) VALUES 
+		<foreach collection="list" item="item" index="index" separator="," >  
+		(
+			#{item.id},
+			#{item.detailId},
+			#{item.keyId},
+			#{item.resPlan},
+			#{item.manCost},
+			#{item.feeCost},
+			#{item.urgeCost},
+			#{item.travlFee},
+			#{item.baseFee},
+			#{item.status},
+			#{item.createBy.id},
+			#{item.createDate},
+			#{item.updateBy.id},
+			#{item.updateDate},
+			#{item.remarks},
+			#{item.delFlag},
+			#{item.prodId},
+			#{item.dcPrjId}
+		)
+		</foreach>
+	</insert>
+	 -->
+	
+	<update id="update">
+		UPDATE cst_detail_cost_info SET 	
+			detail_id = #{detailId},
+			key_id = #{keyId},
+			res_plan = #{resPlan},
+			man_cost = #{manCost},
+			fee_cost = #{feeCost},
+			urge_cost = #{urgeCost},
+			travl_fee = #{travlFee},
+			base_fee = #{baseFee},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			prod_id = #{prodId},
+			dc_prj_id = #{dcPrjId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_detail_cost_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

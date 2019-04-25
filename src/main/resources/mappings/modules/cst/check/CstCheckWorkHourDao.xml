@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.check.CstCheckWorkHourDao">
+    
+	<sql id="cstCheckWorkHourColumns">
+		a.id AS "id",
+		a.res_model_id AS "resModelId",
+		a.res_model_desc AS "resModelDesc",
+		a.line1_remote_hour AS "line1RemoteHour",
+		a.line1_local_hour AS "line1LocalHour",
+		a.line1_depth_hour AS "line1DepthHour",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstCheckWorkHourParaColumns">
+		a.id AS "id",
+		a.res_model_id AS "resModelId",
+		a.res_model_desc AS "resModelDesc",
+		a.line1_remote_hour AS "line1RemoteHour",
+		a.line1_local_hour AS "line1LocalHour",
+		a.line1_depth_hour AS "line1DepthHour",
+		a1.mfr_name AS "mfrName",
+		a1.equip_type_full_name AS "equipTypeName",
+		a.status AS "status"
+	</sql>
+	
+	<sql id="cstCheckWorkHourJoins">
+	</sql>
+	
+	<sql id="cstCheckWorkHourParaJoins">
+		LEFT JOIN 
+		(select t.modelgroup_id,d.mfr_name,b.equip_type_full_name 
+			from prod.t_res_resourcemodelgroup t, prod.t_res_manufactureinfo d, prod.t_res_resourceequiptype b
+			where t.mfr_id = d.mfr_id and  t.equip_type_id = b.equip_type_id ) a1
+		ON a1.modelgroup_id = a.res_model_id 
+	</sql>
+    
+	<select id="getBaseCheckWorkHour" resultType="CstCheckWorkHour">
+		SELECT 
+			<include refid="cstCheckWorkHourParaColumns"/>
+		FROM cst_check_work_hour a
+		<include refid="cstCheckWorkHourParaJoins"/>
+		WHERE a.status = 'A0'
+	</select>
+    
+	<select id="get" resultType="CstCheckWorkHour">
+		SELECT 
+			<include refid="cstCheckWorkHourColumns"/>
+		FROM cst_check_work_hour a
+		<include refid="cstCheckWorkHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="resModelId != null and resModelId != ''">
+				AND a.res_model_id = #{resModelId}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findList" resultType="CstCheckWorkHour">
+		SELECT 
+			<include refid="cstCheckWorkHourColumns"/>
+		FROM cst_check_work_hour a
+		<include refid="cstCheckWorkHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="resModelId != null and resModelId != ''">
+				AND a.res_model_id = #{resModelId}
+			</if>
+			<if test="resModelDesc != null and resModelDesc != ''">
+				AND a.res_model_desc = #{resModelDesc}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstCheckWorkHour">
+		SELECT 
+			<include refid="cstCheckWorkHourColumns"/>
+		FROM cst_check_work_hour a
+		<include refid="cstCheckWorkHourJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_check_work_hour(
+			id,
+			res_model_id,
+			res_model_desc,
+			line1_remote_hour,
+			line1_local_hour,
+			line1_depth_hour,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{resModelId},
+			#{resModelDesc},
+			#{line1RemoteHour},
+			#{line1LocalHour},
+			#{line1DepthHour},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_check_work_hour SET 	
+			res_model_id = #{resModelId},
+			res_model_desc = #{resModelDesc},
+			line1_remote_hour = #{line1RemoteHour},
+			line1_local_hour = #{line1LocalHour},
+			line1_depth_hour = #{line1DepthHour},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_check_work_hour SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

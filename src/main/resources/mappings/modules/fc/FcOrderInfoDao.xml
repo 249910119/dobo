@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.FcOrderInfoDao">
+	
+	<select id="findListByWbmOrderid" resultType="com.dobo.modules.fc.rest.entity.FcActualOrderInfoRest">
+		SELECT 
+			c.ERPXMBH AS "erpxmbh", c.XSYSYB AS "saleOrg", c.fst_svc_type AS "fstSvcType",c.snd_svc_type AS "sndSvcType",
+		      b.service_effdate AS "startDate",b.service_expdate AS "endDate",
+		      (b.final_cost-b.final_subcost-b.final_hostcost) AS "ownCost",b.final_subcost AS "subCost",b.final_hostcost AS "tgCost",
+		      b.order_id AS "wbmOrderid",'ORDER' AS "dataType"
+		FROM PROD.T_ORD_SIGNINFO b
+        LEFT JOIN BI.VW_JCQT_HTLX_FWSBU_BI c on c.project_code=b.dc_prj_id
+		<where>
+			b.order_id in
+			<foreach collection="wbmOrderIds" item="listItem" open="(" close=")" separator="," >
+            	#{listItem}
+           	</foreach>
+		</where>
+	</select>
+	
+	<select id="findListByActual" resultType="com.dobo.modules.fc.rest.entity.FcActualOrderInfoRest">
+		SELECT 
+			c.ERPXMBH AS "erpxmbh", c.XSYSYB AS "saleOrg", c.fst_svc_type AS "fstSvcType",c.snd_svc_type AS "sndSvcType",
+			c.start_date AS "startDate",c.end_date AS "endDate",
+			(c.gc_cost_hj-c.sub_cost-c.tg_cost) AS "ownCost",c.sub_cost AS "subCost",c.tg_cost AS "tgCost",
+			c.wbm_orderid AS "wbmOrderid",'PROJECT' AS "dataType"
+		FROM BI.VW_JCQT_HTLX_FWSBU_BI c
+		<where>
+			<![CDATA[
+			 	c.START_DATE between to_date(#{planReceiptTimeB},'yyyyMMdd') and to_date(#{planReceiptTimeE},'yyyyMMdd')
+				OR c.END_DATE between to_date(#{planReceiptTimeB},'yyyyMMdd') and to_date(#{planReceiptTimeE},'yyyyMMdd')
+			]]>
+		</where>
+	</select>
+	
+	<!-- 计算月份为1月，项目范围：立项时间小于月初<1.1，计划收款时间小于等于月底<=1.31，实际到款时间小于等于月底<=1.31，且计划收款合计大于实际到款合计或者实际到款为0 -->
+	<select id="findListByPlanReceiptTime" resultType="com.dobo.modules.fc.rest.entity.FcActualOrderInfoRest">
+		SELECT 
+		      c.ERPXMBH AS "erpxmbh", c.XSYSYB AS "saleOrg", c.fst_svc_type AS "fstSvcType",c.snd_svc_type AS "sndSvcType",
+		      c.start_date AS "startDate",c.end_date AS "endDate",
+		      (c.gc_cost_hj-c.sub_cost-c.tg_cost) AS "ownCost",c.sub_cost AS "subCost",c.tg_cost AS "tgCost",
+		      c.wbm_orderid AS "wbmOrderid",'PROJECT' AS "dataType"
+		FROM BI.VW_JCQT_HTLX_FWSBU_BI c
+		<where>
+			<![CDATA[ 
+				(c.QY_WBQYJE>0 OR c.QY_NBSRJE>0) AND c.htlxspjsrq >= '20120101' AND SUBSTR(C.ERPXMBH,1,1) != 'R' AND SUBSTR(C.ERPXMBH,2,2) != 'YX'
+				and c.erpxmbh not in (select c2.project_code from dobo.fc_project_info_nocalc c2 where c2.status='A0')
+			]]>
+			<!-- <if test='notAllReceived == "" or notAllReceived == "Y"'>
+				<![CDATA[
+				and c.ERPXMBH IN (
+					SELECT g.ERPXMBH FROM (
+				        SELECT g1.ERPXMBH,SUM(g1.PLAN_GATHER_MONEY_NUM) AS PLAN_GATHER_MONEY_NUM 
+				        FROM bi.VW_GATHER_MONEY_PLAN_CRM g1
+				        WHERE g1.PLAN_GATHER_MONEY_DATE < to_date(#{planReceiptTimeE},'yyyyMMdd')
+				        GROUP BY g1.ERPXMBH 
+					) g ,
+				    (SELECT h1.XMH,SUM(H1.DKJE) AS DKJE 
+				    	FROM BI.VW_ITS_SKYH_FWSBU_BI h1
+					    WHERE h1.DKRQ < #{planReceiptTimeE} 
+					    GROUP BY h1.XMH
+				    ) H
+				    WHERE g.ERPXMBH=h.XMH and g.PLAN_GATHER_MONEY_NUM > h.DKJE
+				    UNION ALL
+				    SELECT g1.ERPXMBH FROM bi.VW_GATHER_MONEY_PLAN_CRM g1
+				    WHERE g1.PLAN_GATHER_MONEY_DATE < to_date(#{planReceiptTimeE},'yyyyMMdd')
+				    and NOT EXISTS (
+				        SELECT 1 FROM BI.VW_ITS_SKYH_FWSBU_BI h1 WHERE h1.XMH = g1.ERPXMBH and h1.DKRQ < #{planReceiptTimeE}
+				    )
+				)
+				]]>
+			</if> -->
+			<if test="projectCode != null and projectCode != ''">
+				and c.ERPXMBH = #{projectCode}
+			</if>
+			<if test="fstSvcTypeName != null and fstSvcTypeName != ''">
+				AND c.FST_SVC_TYPE = #{fstSvcTypeName}
+			</if>
+		</where>
+	</select>
+
+	<!-- 计算月份为1月，项目范围：1.1=<立项时间在1月期间<=1.31 -->
+	<select id="findListByHtlxrq" resultType="com.dobo.modules.fc.rest.entity.FcOrderInfoRest">
+		SELECT 
+		      c.project_code AS "projectCode", c.project_code AS "orderId", c.fst_svc_type AS "fstSvcType",c.snd_svc_type AS "sndSvcType",
+		      c.start_date AS "serviceDateBegin",c.end_date AS "serviceDateEnd",
+		      (c.gc_cost_hj-c.sub_cost) AS "ownProdCost",c.sub_cost AS "specifySubCost",c.tg_cost AS "tgCost"
+		FROM BI.VW_JCQT_HTLX_FWSBU_BI c
+		<where>
+			<![CDATA[ 
+			 	c.htlxspjsrq >= '20120101' and SUBSTR(C.PROJECT_CODE,1,1) != 'R' and SUBSTR(C.PROJECT_CODE,2,2) != 'YX'
+				and  c.htlxspjsrq >= #{htlxspjsrqB} and c.htlxspjsrq <= #{htlxspjsrqE} 
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				and c.ERPXMBH = #{projectCode}
+			</if>
+		</where>
+	</select>
+    
+	<sql id="fcOrderInfoColumns">
+		a.id AS "id",
+		a.fc_project_info_id AS "fcProjectInfoId",
+		a.order_id AS "orderId",
+		a.fst_svc_type AS "fstSvcType",
+		a.snd_svc_type AS "sndSvcType",
+		a.service_date_begin AS "serviceDateBegin",
+		a.service_date_end AS "serviceDateEnd",
+		a.sign_amount AS "signAmount",
+		a.own_prod_cost AS "ownProdCost",
+		a.specify_sub_cost AS "specifySubCost",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a1.id AS "fcProjectInfo.id",
+		a1.project_code AS "fcProjectInfo.projectCode",
+		a1.project_name AS "fcProjectInfo.projectName"
+	</sql>
+	
+	<sql id="fcOrderInfoJoins">
+		LEFT JOIN fc_project_info a1 ON a1.id = a.fc_project_info_id
+	</sql>
+    
+	<select id="get" resultType="FcOrderInfo">
+		SELECT 
+			<include refid="fcOrderInfoColumns"/>
+		FROM fc_order_info a
+		<include refid="fcOrderInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FcOrderInfo">
+		SELECT 
+			<include refid="fcOrderInfoColumns"/>
+		FROM fc_order_info a
+		<include refid="fcOrderInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="orderId != null and orderId != ''">
+				and a.order_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{orderId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{orderId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{orderId},'%')</if>
+			</if>
+			<if test="sndSvcType != null and sndSvcType != ''">
+				and a.snd_svc_type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{sndSvcType}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{sndSvcType}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{sndSvcType},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				and a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FcOrderInfo">
+		SELECT 
+			<include refid="fcOrderInfoColumns"/>
+		FROM fc_order_info a
+		<include refid="fcOrderInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO fc_order_info(
+			id,
+			fc_project_info_id,
+			order_id,
+			fst_svc_type,
+			snd_svc_type,
+			service_date_begin,
+			service_date_end,
+			sign_amount,
+			own_prod_cost,
+			specify_sub_cost,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{fcProjectInfoId},
+			#{orderId},
+			#{fstSvcType},
+			#{sndSvcType},
+			#{serviceDateBegin},
+			#{serviceDateEnd},
+			#{signAmount},
+			#{ownProdCost},
+			#{specifySubCost},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE fc_order_info SET 	
+			fc_project_info_id = #{fcProjectInfoId},
+			order_id = #{orderId},
+			fst_svc_type = #{fstSvcType},
+			snd_svc_type = #{sndSvcType},
+			service_date_begin = #{serviceDateBegin},
+			service_date_end = #{serviceDateEnd},
+			sign_amount = #{signAmount},
+			own_prod_cost = #{ownProdCost},
+			specify_sub_cost = #{specifySubCost},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			status = #{status},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE fc_order_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

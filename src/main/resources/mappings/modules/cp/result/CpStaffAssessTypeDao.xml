@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cp.dao.result.CpStaffAssessTypeDao">
+    
+	<sql id="cpStaffAssessTypeColumns">
+		a.id AS "id",
+		a.job_level_id AS "jobLevelId",
+		a.module_id AS "moduleId",
+		a.module_name AS "moduleName",
+		a.ability_id AS "abilityId",
+		a.ability_name AS "abilityName",
+		a.action_id AS "actionId",
+		a.action_name AS "actionName",
+		a.number_name AS "numberName",
+		a.module_order AS "moduleOrder",
+		a.ability_order AS "abilityOrder",
+		a.action_order AS "actionOrder",
+		a.remark1 AS "remark1",
+		a.remark2 AS "remark2",
+		a.remark3 AS "remark3",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.end_date AS "endDate"
+	</sql>
+	
+	<sql id="cpStaffAssessTypeJoins">
+	</sql>
+    
+	<select id="get" resultType="CpStaffAssessType">
+		SELECT 
+			<include refid="cpStaffAssessTypeColumns"/>
+		FROM cp_staff_assess_type a
+		<include refid="cpStaffAssessTypeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CpStaffAssessType">
+		SELECT 
+			<include refid="cpStaffAssessTypeColumns"/>
+		FROM cp_staff_assess_type a
+		<include refid="cpStaffAssessTypeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} and a.status = 'A0'
+			<if test="jobLevelId != null and jobLevelId != ''">
+				AND a.job_level_id = #{jobLevelId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CpStaffAssessType">
+		SELECT 
+			<include refid="cpStaffAssessTypeColumns"/>
+		FROM cp_staff_assess_type a
+		<include refid="cpStaffAssessTypeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cp_staff_assess_type(
+			id,
+			job_level_id,
+			module_id,
+			module_name,
+			ability_id,
+			ability_name,
+			action_id,
+			action_name,
+			number_name,
+			module_order,
+			ability_order,
+			action_order,
+			remark1,
+			remark2,
+			remark3,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag,
+			end_date
+		) VALUES (
+			#{id},
+			#{jobLevelId},
+			#{moduleId},
+			#{moduleName},
+			#{abilityId},
+			#{abilityName},
+			#{actionId},
+			#{actionName},
+			#{numberName},
+			#{moduleOrder},
+			#{abilityOrder},
+			#{actionOrder},
+			#{remark1},
+			#{remark2},
+			#{remark3},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag},
+			#{endDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cp_staff_assess_type SET 	
+			job_level_id = #{jobLevelId},
+			module_id = #{moduleId},
+			module_name = #{moduleName},
+			ability_id = #{abilityId},
+			ability_name = #{abilityName},
+			action_id = #{actionId},
+			action_name = #{actionName},
+			number_name = #{numberName},
+			module_order = #{moduleOrder},
+			ability_order = #{abilityOrder},
+			action_order = #{actionOrder},
+			remark1 = #{remark1},
+			remark2 = #{remark2},
+			remark3 = #{remark3},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag},
+			end_date = #{endDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cp_staff_assess_type SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

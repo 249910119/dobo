@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.FcInterrestRateDao">
+    
+	<sql id="fcInterrestRateColumns">
+		a.id AS "id",
+		a.rate_type AS "rateType",
+		a.rate_name AS "rateName",
+		a.rate_value AS "rateValue",
+		a.rate_publish_date AS "ratePublishDate",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="fcInterrestRateJoins">
+	</sql>
+	
+	<!-- 查询最新利率 -->
+	<select id="getLatestInterrestRate" resultType="FcInterrestRate">
+		SELECT 
+			<include refid="fcInterrestRateColumns"/>
+		FROM fc_interrest_rate a
+		<include refid="fcInterrestRateJoins"/>
+		<where>
+			<![CDATA[
+			a.del_flag = '0' and a.rate_type = #{rateType}
+    		and to_char(a.create_date,'yyyyMMdd') <= #{createDateStr} and (a.status = 'A0' or (a.status = 'A1' and a.pre_status = 'A0' and to_char(a.status_change_date,'yyyyMMdd') > #{createDateStr})) 
+			]]>
+		</where>		
+	</select>
+    
+	<select id="get" resultType="FcInterrestRate">
+		SELECT 
+			<include refid="fcInterrestRateColumns"/>
+		FROM fc_interrest_rate a
+		<include refid="fcInterrestRateJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FcInterrestRate">
+		SELECT 
+			<include refid="fcInterrestRateColumns"/>
+		FROM fc_interrest_rate a
+		<include refid="fcInterrestRateJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="rateType != null and rateType != ''">
+				AND a.rate_type = #{rateType}
+			</if>
+			<if test="rateName != null and rateName != ''">
+				AND a.rate_name = #{rateName}
+			</if>
+			<if test="ratePublishDate != null and ratePublishDate != ''">
+				AND a.rate_publish_date = #{ratePublishDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FcInterrestRate">
+		SELECT 
+			<include refid="fcInterrestRateColumns"/>
+		FROM fc_interrest_rate a
+		<include refid="fcInterrestRateJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO fc_interrest_rate(
+			id,
+			rate_type,
+			rate_name,
+			rate_value,
+			rate_publish_date,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{rateType},
+			#{rateName},
+			#{rateValue},
+			#{ratePublishDate},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE fc_interrest_rate SET 	
+			rate_type = #{rateType},
+			rate_name = #{rateName},
+			rate_value = #{rateValue},
+			rate_publish_date = #{ratePublishDate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			status = #{status},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE fc_interrest_rate SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

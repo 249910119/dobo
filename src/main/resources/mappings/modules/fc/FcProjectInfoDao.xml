@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.FcProjectInfoDao">
+
+	<select id="findListByActual" resultType="com.dobo.modules.fc.rest.entity.FcProjectInfoRest">
+		SELECT 
+			c.ERPXMBH as "projectCode",c.project_name as "projectName",c.subs_name as "custName",c.fst_svc_type as "fstSvcType",
+		    c.snd_svc_type as "sndSvcType",c.xsysyb as "saleOrg",c.xsyxm as "salesName",c.is_wbm_order as "hasWbmOrder",
+		    c.qy_wbqyje as "signMoney",c.xmsy_cwfy as "xmsyCwfy",c.start_date as "startDate",c.end_date as "endDate",c.tax_type as "taxType"
+		FROM BI.VW_JCQT_HTLX_FWSBU_BI c
+		<where>
+			<![CDATA[ 
+				c.htlxspjsrq >= '20120101'
+				AND c.erpxmbh IN (
+					select c1.erpxmbh from (select a1.xmh erpxmbh,sum(a1.dkje) dkje from bi.VW_ITS_SKYH_FWSBU_BI a1 group by a1.xmh) c1, bi.vw_jcqt_htlx_fwsbu_bi b1
+					where c1.ERPXMBH=b1.erpxmbh and c1.dkje < b1.QY_WBQYJE+b1.QY_NBSRJE-0.1 and b1.HTLXSPJSRQ <= #{planReceiptTimeB}
+					UNION select b2.erpxmbh from bi.vw_jcqt_htlx_fwsbu_bi b2 where b2.HTLXSPJSRQ >= #{planReceiptTimeB}
+				)
+			]]>
+		</where>
+	</select>
+	
+	<!-- 计算月份为1月，项目范围：立项时间小于月初<1.1，计划收款时间小于等于月底<=1.31，实际到款时间小于等于月底<=1.31，且计划收款合计大于实际到款合计或者实际到款为0 -->
+	<select id="findListByPlanReceiptTime" resultType="com.dobo.modules.fc.rest.entity.FcProjectInfoRest">
+		SELECT 
+			c.ERPXMBH as "projectCode",c.project_name as "projectName",c.subs_name as "custName",c.fst_svc_type as "fstSvcType",
+		    c.snd_svc_type as "sndSvcType",c.xsysyb as "saleOrg",c.xsyxm as "salesName",c.is_wbm_order as "hasWbmOrder",
+		    c.qy_wbqyje as "signMoney",c.xmsy_cwfy as "xmsyCwfy",c.start_date as "startDate",c.end_date as "endDate",c.tax_type as "taxType"
+		FROM BI.VW_JCQT_HTLX_FWSBU_BI c
+		<where>
+			<![CDATA[ 
+				(c.QY_WBQYJE>0 OR c.QY_NBSRJE>0) AND c.htlxspjsrq >= '20120101' AND SUBSTR(C.ERPXMBH,1,1) != 'R' AND SUBSTR(C.ERPXMBH,2,2) != 'YX'
+				and c.erpxmbh in (select c2.project_code from dobo.fc_project_info_calc c2 where c2.status='A0')
+			]]>
+			<!-- and c.erpxmbh not in (select c2.project_code from dobo.fc_project_info_nocalc c2 where c2.status='A0') -->
+			<!-- <if test='notAllReceived == "" or notAllReceived == "Y"'>
+				<![CDATA[
+				AND c.ERPXMBH IN (
+					SELECT g.ERPXMBH FROM (
+				        SELECT g1.ERPXMBH,SUM(g1.PLAN_GATHER_MONEY_NUM) AS PLAN_GATHER_MONEY_NUM 
+				        FROM bi.VW_GATHER_MONEY_PLAN_CRM g1
+				        WHERE g1.PLAN_GATHER_MONEY_DATE < to_date(#{planReceiptTimeE},'yyyyMMdd')
+				        GROUP BY g1.ERPXMBH 
+					) g ,
+				    (SELECT h1.XMH,SUM(H1.DKJE) AS DKJE 
+				    	FROM BI.VW_ITS_SKYH_FWSBU_BI h1
+					    WHERE h1.DKRQ < #{planReceiptTimeE} 
+					    GROUP BY h1.XMH
+				    ) H
+				    WHERE g.ERPXMBH=h.XMH AND g.PLAN_GATHER_MONEY_NUM > h.DKJE
+				    UNION ALL
+				    SELECT g1.ERPXMBH FROM bi.VW_GATHER_MONEY_PLAN_CRM g1
+				    WHERE g1.PLAN_GATHER_MONEY_DATE < to_date(#{planReceiptTimeE},'yyyyMMdd')
+				    AND NOT EXISTS (
+				        SELECT 1 FROM BI.VW_ITS_SKYH_FWSBU_BI h1 WHERE h1.XMH = g1.ERPXMBH AND h1.DKRQ < #{planReceiptTimeE}
+				    )
+				)
+				]]>
+			</if> -->
+			<if test="projectCode != null and projectCode != ''">
+				AND c.ERPXMBH = #{projectCode}
+			</if>
+			<if test="fstSvcTypeName != null and fstSvcTypeName != ''">
+				AND c.FST_SVC_TYPE = #{fstSvcTypeName}
+			</if>
+		</where>
+	</select>
+
+	<!-- 计算月份为1月，项目范围：1.1=<立项时间在1月期间<=1.31 -->
+	<select id="findListByHtlxrq" resultType="com.dobo.modules.fc.rest.entity.FcProjectInfoRest">
+		SELECT 
+			c.project_code as "projectCode",c.project_name as "projectName",c.subs_name as "custName",c.fst_svc_type as "fstSvcType",
+		  	c.snd_svc_type as "sndSvcType",c.xsysyb as "saleOrg",c.xsyxm as "salesName",c.is_wbm_order as "hasWbmOrder",
+		  	c.QY_WBQYJE as "signMoney",c.xmsy_cwfy as "xmsyCwfy",c.start_date as "startDate",c.end_date as "endDate",c.tax_type as "taxType"
+		FROM BI.VW_JCQT_HTLX_FWSBU_BI c
+		<where>
+			<![CDATA[
+				(c.QY_WBQYJE>0 OR c.QY_NBSRJE>0)
+			 	AND c.htlxspjsrq >= '20120101' AND SUBSTR(C.ERPXMBH,1,1) != 'R' AND SUBSTR(C.ERPXMBH,2,2) != 'YX'
+			 	AND c.htlxspjsrq >= #{htlxspjsrqB} AND c.htlxspjsrq <= #{htlxspjsrqE} 
+			]]>
+			<if test="projectCode != null and projectCode != ''">
+				AND c.ERPXMBH = #{projectCode}
+			</if>
+		</where>
+	</select>
+    
+	<sql id="fcProjectInfoColumns">
+		a.id AS "id",
+		a.project_code AS "projectCode",
+		a.project_name AS "projectName",
+		a.cust_name AS "custName",
+		a.fst_svc_type AS "fstSvcType",
+		a.snd_svc_type AS "sndSvcType",
+		a.sale_org AS "saleOrg",
+		a.business_code AS "businessCode",
+		a.sales_name AS "salesName",
+		a.has_wbm_order AS "hasWbmOrder",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="fcProjectInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="FcProjectInfo">
+		SELECT 
+			<include refid="fcProjectInfoColumns"/>
+		FROM fc_project_info a
+		<include refid="fcProjectInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FcProjectInfo">
+		SELECT 
+			<include refid="fcProjectInfoColumns"/>
+		FROM fc_project_info a
+		<include refid="fcProjectInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="projectCode != null and projectCode != ''">
+				AND a.project_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{projectCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{projectCode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{projectCode},'%')</if>
+			</if>
+			<if test="projectName != null and projectName != ''">
+				AND a.project_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{projectName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{projectName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{projectName},'%')</if>
+			</if>
+			<if test="saleOrg != null and saleOrg != ''">
+				AND a.sale_org LIKE 
+					<if test="dbName == 'oracle'">'%'||#{saleOrg}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{saleOrg}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{saleOrg},'%')</if>
+			</if>
+			<if test="salesName != null and salesName != ''">
+				AND a.sales_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{salesName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{salesName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{salesName},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FcProjectInfo">
+		SELECT 
+			<include refid="fcProjectInfoColumns"/>
+		FROM fc_project_info a
+		<include refid="fcProjectInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO fc_project_info(
+			id,
+			project_code,
+			project_name,
+			cust_name,
+			fst_svc_type,
+			snd_svc_type,
+			sale_org,
+			business_code,
+			sales_name,
+			has_wbm_order,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{projectCode},
+			#{projectName},
+			#{custName},
+			#{fstSvcType},
+			#{sndSvcType},
+			#{saleOrg},
+			#{businessCode},
+			#{salesName},
+			#{hasWbmOrder},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE fc_project_info SET 	
+			project_code = #{projectCode},
+			project_name = #{projectName},
+			cust_name = #{custName},
+			fst_svc_type = #{fstSvcType},
+			snd_svc_type = #{sndSvcType},
+			sale_org = #{saleOrg},
+			business_code = #{businessCode},
+			sales_name = #{salesName},
+			has_wbm_order = #{hasWbmOrder},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			status = #{status},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE fc_project_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

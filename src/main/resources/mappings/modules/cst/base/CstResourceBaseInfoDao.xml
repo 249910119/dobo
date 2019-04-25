@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.base.CstResourceBaseInfoDao">
+    
+	<sql id="cstResourceBaseInfoColumns">
+		a.resource_id AS "resourceId",
+		a.resource_name AS "resourceName",
+		a.resource_desc AS "resourceDesc",
+		a.resource_class AS "resourceClass",
+		a.modelgroup_id AS "modelGroupId",
+		a.equip_type_id AS "equipTypeId",
+		a.resstattype_id AS "resstattypeId",
+		a.mfr_id AS "mfrId",
+		a.labor_level AS "laborLevel",
+		<!-- a.mfr_name AS "mfrName", 
+		a.status AS "status" -->
+		a1.mfr_name AS "mfrName",
+		a2.modelgroup_full_name AS "modelGroupName",
+		a3.equip_type_full_name AS "equipTypeName",
+		a4.resstattype_name AS "resstattypeName",
+		a.resource_status AS "status"
+	</sql>
+	
+	<sql id="cstResourceBaseInfoJoins">
+		LEFT JOIN prod.t_res_manufactureinfo a1 ON a1.mfr_id = a.mfr_id
+		LEFT JOIN prod.t_res_resourcemodelgroup a2 ON a2.modelgroup_id = a.modelgroup_id
+		LEFT JOIN prod.t_res_resourceequiptype a3 ON a3.equip_type_id = a.equip_type_id
+		LEFT JOIN prod.t_res_resourcestattype a4 ON a4.resstattype_id = a.resstattype_id
+	</sql>
+    
+	<select id="get" resultType="CstResourceBaseInfo">
+		SELECT 
+			<include refid="cstResourceBaseInfoColumns"/>
+		<!-- FROM cst_resource_base_info a -->
+		FROM prod.t_res_resourcebaseinfo a
+		<include refid="cstResourceBaseInfoJoins"/>
+		WHERE a.resource_id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstResourceBaseInfo">
+		SELECT 
+			<include refid="cstResourceBaseInfoColumns"/>
+		<!-- FROM cst_resource_base_info a -->
+		FROM prod.t_res_resourcebaseinfo a
+			<include refid="cstResourceBaseInfoJoins"/>
+		<where>
+			<if test="resourceId != null and resourceId != ''">
+				AND a.resource_id = #{resourceId}
+			</if>
+			<if test="resourceName != null and resourceName != ''">
+				AND UPPER(a.resource_name) LIKE 
+					<if test="dbName == 'oracle'">'%'||UPPER(#{resourceName})||'%'</if>
+					<if test="dbName == 'mssql'">'%'+UPPER(#{resourceName})+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',UPPER(#{resourceName}),'%')</if>
+			</if>
+			<if test="mfrName != null and mfrName != ''">
+				AND UPPER(a1.mfr_name) LIKE 
+					<if test="dbName == 'oracle'">'%'||UPPER(#{mfrName})||'%'</if>
+					<if test="dbName == 'mssql'">'%'+UPPER(#{mfrName})+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',UPPER(#{mfrName}),'%')</if>
+			</if>
+			AND a.resource_status = 'A0'
+			<if test="status != null and status != ''">
+				<!-- AND a.resource_status = #{status} -->
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.resource_id DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstResourceBaseInfo">
+		SELECT 
+			<include refid="cstResourceBaseInfoColumns"/>
+		<!-- FROM cst_resource_base_info a -->
+		FROM prod.t_res_resourcebaseinfo a
+			<include refid="cstResourceBaseInfoJoins"/>
+		<where>
+			a.resource_status = 'A0'
+			<!-- a.status = 'A0' -->
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.resource_id DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+</mapper>

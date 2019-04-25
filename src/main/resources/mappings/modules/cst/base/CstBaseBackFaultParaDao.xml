@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.base.CstBaseBackFaultParaDao">
+    
+	<sql id="cstBaseBackFaultParaColumns">
+		a.detail_id AS "detailId",
+		a.mfr_name AS "mfrName",
+		a.equip_type_name AS "equipTypeName",
+		a.model_group_name AS "modelGroupName",
+		a.resstattype_name AS "resstattypeName",
+		a.resource_desc AS "resourceDesc",
+		a.online_amount AS "onlineAmount",
+		a.change_amount AS "changeAmount",
+		a.back_fault_rate AS "backFaultRate",
+		a.aver_fault_cost AS "averFaultCost",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstBaseBackFaultParaJoins">
+	</sql>
+    
+	<select id="get" resultType="CstBaseBackFaultPara">
+		SELECT 
+			<include refid="cstBaseBackFaultParaColumns"/>
+		FROM cst_base_back_fault_para a
+		<include refid="cstBaseBackFaultParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstBaseBackFaultPara">
+		SELECT 
+			<include refid="cstBaseBackFaultParaColumns"/>
+		FROM cst_base_back_fault_para a
+		<include refid="cstBaseBackFaultParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstBaseBackFaultPara">
+		SELECT 
+			<include refid="cstBaseBackFaultParaColumns"/>
+		FROM cst_base_back_fault_para a
+		<include refid="cstBaseBackFaultParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_base_back_fault_para(
+			detail_id,
+			mfr_name,
+			equip_type_name,
+			model_group_name,
+			resstattype_name,
+			resource_desc,
+			online_amount,
+			change_amount,
+			back_fault_rate,
+			aver_fault_cost,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{detailId},
+			#{mfrName},
+			#{equipTypeName},
+			#{modelGroupName},
+			#{resstattypeName},
+			#{resourceDesc},
+			#{onlineAmount},
+			#{changeAmount},
+			#{backFaultRate},
+			#{averFaultCost},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_base_back_fault_para SET 	
+			detail_id = #{detailId},
+			mfr_name = #{mfrName},
+			equip_type_name = #{equipTypeName},
+			model_group_name = #{modelGroupName},
+			resstattype_name = #{resstattypeName},
+			resource_desc = #{resourceDesc},
+			online_amount = #{onlineAmount},
+			change_amount = #{changeAmount},
+			back_fault_rate = #{backFaultRate},
+			aver_fault_cost = #{averFaultCost},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_base_back_fault_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

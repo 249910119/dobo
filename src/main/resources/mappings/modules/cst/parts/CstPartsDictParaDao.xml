@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.parts.CstPartsDictParaDao">
+    
+	<sql id="cstPartsDictParaColumns">
+		a.id AS "id",
+		a.para_type AS "paraType",
+		a.para_id AS "paraId",
+		a.para_name AS "paraName",
+		a.para_value AS "paraValue",
+		a.refer_cost_item AS "referCostItem",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag"
+	</sql>
+	
+	<sql id="cstPartsDictParaJoins">
+	</sql>
+    
+	<select id="get" resultType="CstPartsDictPara">
+		SELECT 
+			<include refid="cstPartsDictParaColumns"/>
+		FROM cst_parts_dict_para a
+		<include refid="cstPartsDictParaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstPartsDictPara">
+		SELECT 
+			<include refid="cstPartsDictParaColumns"/>
+		FROM cst_parts_dict_para a
+		<include refid="cstPartsDictParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="paraType != null and paraType != ''">
+				AND a.para_type = #{paraType}
+			</if>
+			<if test="paraName != null and paraName != ''">
+				AND a.para_name = #{paraName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstPartsDictPara">
+		SELECT 
+			<include refid="cstPartsDictParaColumns"/>
+		FROM cst_parts_dict_para a
+		<include refid="cstPartsDictParaJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_parts_dict_para(
+			id,
+			para_type,
+			para_id,
+			para_name,
+			para_value,
+			refer_cost_item,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{paraType},
+			#{paraId},
+			#{paraName},
+			#{paraValue},
+			#{referCostItem},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_parts_dict_para SET 	
+			para_type = #{paraType},
+			para_id = #{paraId},
+			para_name = #{paraName},
+			para_value = #{paraValue},
+			refer_cost_item = #{referCostItem},
+			status = #{status},
+			remarks = #{remarks},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_parts_dict_para SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

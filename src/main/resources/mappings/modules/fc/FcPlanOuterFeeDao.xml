@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.fc.dao.FcPlanOuterFeeDao">
+    
+	<sql id="fcPlanOuterFeeColumns">
+		a.id AS "id",
+		a.fc_project_info_id AS "fcProjectInfoId",
+		a.financial_cost AS "financialCost",
+		a.financial_month AS "financialMonth",
+		a.month_balance AS "monthBalance",
+		a.calculate_time AS "calculateTime",
+		a.loan_rate AS "loanRate",
+		a.deposit_rate AS "depositRate",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.pre_status AS "preStatus",
+		a.status_change_date AS "statusChangeDate",
+		a.save_flag AS "saveFlag",
+		a.calc_para_json AS "calcParaJson",
+		a1.id AS "fcProjectInfo.id",
+		a1.project_code AS "fcProjectInfo.projectCode",
+		a1.project_name AS "fcProjectInfo.projectName",
+		a1.fst_svc_type AS "fcProjectInfo.fstSvcType",
+		a1.sale_org AS "fcProjectInfo.saleOrg",
+		a1.sales_name AS "fcProjectInfo.salesName"
+	</sql>
+	
+	<sql id="fcPlanOuterFeeJoins">
+		LEFT JOIN fc_project_info a1 ON a1.id = a.fc_project_info_id
+	</sql>
+    
+	<select id="get" resultType="FcPlanOuterFee">
+		SELECT 
+			<include refid="fcPlanOuterFeeColumns"/>
+		FROM fc_plan_outer_fee a
+		<include refid="fcPlanOuterFeeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="FcPlanOuterFee">
+		SELECT 
+			<include refid="fcPlanOuterFeeColumns"/>
+		FROM fc_plan_outer_fee a
+		<include refid="fcPlanOuterFeeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="fcProjectInfoId != null and fcProjectInfoId != ''">
+				AND a.fc_project_info_id = #{fcProjectInfoId}
+			</if>
+			<if test="financialMonth != null and financialMonth != ''">
+				AND a.financial_month = #{financialMonth}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="useFlag != null and useFlag != ''">
+				AND a.use_flag = #{useFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findListBeforeFinancialMonth" resultType="FcPlanOuterFee">
+		SELECT 
+			<include refid="fcPlanOuterFeeColumns"/>
+		FROM fc_plan_outer_fee a
+		<include refid="fcPlanOuterFeeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} AND a.status = 'A0' AND a.fc_project_info_id = #{fcProjectInfoId} AND a.financial_month &lt;= #{financialMonth}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="FcPlanOuterFee">
+		SELECT 
+			<include refid="fcPlanOuterFeeColumns"/>
+		FROM fc_plan_outer_fee a
+		<include refid="fcPlanOuterFeeJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO fc_plan_outer_fee(
+			id,
+			fc_project_info_id,
+			financial_cost,
+			financial_month,
+			month_balance,
+			calculate_time,
+			loan_rate,
+			deposit_rate,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			calc_para_json,
+			del_flag,
+			pre_status,
+			status_change_date,
+			save_flag
+		) VALUES (
+			#{id},
+			#{fcProjectInfoId},
+			#{financialCost},
+			#{financialMonth},
+			#{monthBalance},
+			#{calculateTime},
+			#{loanRate},
+			#{depositRate},
+			#{status},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{calcParaJson},
+			#{delFlag},
+			#{preStatus},
+			#{statusChangeDate},
+			#{saveFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE fc_plan_outer_fee SET 	
+			fc_project_info_id = #{fcProjectInfoId},
+			financial_cost = #{financialCost},
+			financial_month = #{financialMonth},
+			month_balance = #{monthBalance},
+			calculate_time = #{calculateTime},
+			loan_rate = #{loanRate},
+			deposit_rate = #{depositRate},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			calc_para_json = #{calcParaJson},
+			status = #{status},
+			pre_status = #{preStatus},
+			status_change_date = #{statusChangeDate},
+			save_flag = #{saveFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE fc_plan_outer_fee SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

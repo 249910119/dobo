@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dobo.modules.cst.dao.model.CstModelModuleInfoDao">
+    
+	<sql id="cstModelModuleInfoColumns">
+		a.id AS "id",
+		a.module_type AS "moduleType",
+		a.module_name AS "moduleName",
+		a.module_desc AS "moduleDesc",
+		a.status AS "status",
+		a.version_no AS "versionNo",
+		a.version_date AS "versionDate",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="cstModelModuleInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="CstModelModuleInfo">
+		SELECT 
+			<include refid="cstModelModuleInfoColumns"/>
+		FROM cst_model_module_info a
+		<include refid="cstModelModuleInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CstModelModuleInfo">
+		SELECT 
+			<include refid="cstModelModuleInfoColumns"/>
+		FROM cst_model_module_info a
+		<include refid="cstModelModuleInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="moduleType != null and moduleType != ''">
+				AND a.module_type = #{moduleType}
+			</if>
+			<if test="moduleName != null and moduleName != ''">
+				AND a.module_name = #{moduleName}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CstModelModuleInfo">
+		SELECT 
+			<include refid="cstModelModuleInfoColumns"/>
+		FROM cst_model_module_info a
+		<include refid="cstModelModuleInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO cst_model_module_info(
+			id,
+			module_type,
+			module_name,
+			module_desc,
+			status,
+			version_no,
+			version_date,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{moduleType},
+			#{moduleName},
+			#{moduleDesc},
+			#{status},
+			#{versionNo},
+			#{versionDate},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE cst_model_module_info SET 	
+			module_type = #{moduleType},
+			module_name = #{moduleName},
+			module_desc = #{moduleDesc},
+			status = #{status},
+			version_no = #{versionNo},
+			version_date = #{versionDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE cst_model_module_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
